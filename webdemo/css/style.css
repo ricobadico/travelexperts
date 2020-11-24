@@ -21,7 +21,7 @@ a{
   align-items: flex-start;
   align-content: flex-start;
   height:35vw;
-  min-height:200px;
+  min-height:auto; /* [Eric] - changed from fixed height to ensure no extra space beneath on mobile*/
   max-height:1000px;
   min-width:100%;
   color:#eee;
@@ -80,11 +80,19 @@ a{
 }
 
 .gallery {
-  width: 900px;
   margin: auto;
   border-radius: 3px;
   overflow: hidden;
   position: relative;
+  /* [Eric] - set responsive size, then used grid to make children behave */
+  /* This also fixed header issues */
+  width:auto; 
+  max-width: 1200px;
+  min-width:300px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 300px);
+  justify-content: center;
+  justify-items: center;
 }
 .img-c {
   width: 300px;
@@ -95,7 +103,6 @@ a{
 }
 
 .img-w {
-  position: absolute;
   width: 100%;
   height: 100%;
   background-size: cover;
