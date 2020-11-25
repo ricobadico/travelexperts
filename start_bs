@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+browser-sync start -s  -f "./Media .webdemo ./webdemo/js/ ./webdemo./css/ ./webdemo/static/" --startPath './webdemo/index.html'
