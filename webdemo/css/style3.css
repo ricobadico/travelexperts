@@ -10,6 +10,36 @@
   position: relative;
 }
 
+/* Styles for agency - Eric */
+.our-team.agency-container {
+  display: flex;
+  justify-content: space-evenly;
+  font-size: xx-large;
+}
+
+.our-team.agency-container .picture {
+  display: inline-block;
+  height: 200px;
+  width: 200px;
+  margin-bottom: 10px;
+  z-index: 1;
+}
+
+.our-team.agency-container .peek-up {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  justify-content: center;
+}
+
+.our-team.agency-container .peek-up *{
+  text-align: center;
+}
+
+.our-team h2{
+  margin-bottom: 40px;
+}
+
+
 /*styles agent image*/
 .our-team .picture {
   display: inline-block;
@@ -83,7 +113,7 @@
   padding: 0;
 }
 
-.our-team .phone {
+.our-team .peek-up {
   width: 100%;
   padding: 0;
   margin: 0;
@@ -94,10 +124,10 @@
   transition: all 0.5s ease 0s;
 }
 
-.our-team:hover .phone {
+.our-team:hover .peek-up {
   bottom: 0;
 }
 
-.our-team .phone li {
+.our-team .peek-up li {
   display: inline-block;
 }
