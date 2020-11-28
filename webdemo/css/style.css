@@ -105,6 +105,10 @@ a{
 }
 
 /* Image galleries */
+.content.firstGallery{
+  margin-top: 1em;
+}
+
 .gallery {
   overflow: hidden;
   position: relative;
