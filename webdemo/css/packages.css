@@ -76,6 +76,8 @@ h1{
     min-width: 300px;
     justify-content: center;
     box-shadow: 0 5px 10px grey;
+    border-radius: 25px;
+    overflow: hidden;
 }
 
 .package-image{
