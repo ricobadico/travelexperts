@@ -3,8 +3,9 @@
 <head>
 
 	<title>Register Page</title>
-	<link rel="stylesheet" href="reset.css" >
+	<!--link rel="stylesheet" href="css/reset.css" --> <!-- reset removed by bob-->
 	<link rel="stylesheet" href="css/style2.css">
+	<script src="js/script2.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<style>
 		input[name]{
@@ -65,16 +66,18 @@
 
 <div class="container">
 <div class="registrationForm">	
-		<form method="POST" action="bouncer.php">
+		<form method="POST" action="bouncer.php" class="needs-validation" novalidate>
 			<h4 class="text-center">Registration Form</h4>
 				<div class="form-row ">
 	    			<div class="col-sm-6 ">
 						<label for="firstName">First Name:</label><br/>
-						<input class="form-control" type="text" name="firstName" id="firstName" required="required"><br/>
+						<input class="form-control" type="text" name="firstName" id="firstName" required="required" placeholder="First Name">
+						<div class="invalid-feedback">Please enter your first name</div><br/>
 					</div>	
 					<div class="col-sm-6 ">
 						<label for="lastName">Last Name:</label><br/>
-						<input class="form-control" type="text" name="lastName" id="lastName" required="required">
+						<input class="form-control" type="text" name="lastName" id="lastName" required="required" placeholder="Last Name">
+						<div class="invalid-feedback">Please enter your last name</div>
 					</div>
 				</div>
 				<div class="form-row ">
@@ -84,29 +87,42 @@
 						<div class="input-group-prepend">
 	          				<span class="input-group-text" id="inputGroupPrepend">@</span>
 	        			</div>
-						<input class="form-control" type="text" name="userName" id="userName" required="required"><br/>
+						<input class="form-control" type="text" name="userName" id="userName" required="required" placeholder="Username">
+						<div class="invalid-feedback">Please enter a username</div>
+						<br/>
 						</div>	
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="pwd">Password:</label><br/>
-						<input class="form-control" type="password" name="pwd" id="pwd" required="required">
+						<input class="form-control" type="password" name="pwd" id="pwd" required="required" placeholder="Password">
+						<div class="invalid-feedback">Please enter a password</div>
 					</div>	
 				</div>	
 
 				<div class="form-row">	
 	    			<div class="col-sm-6">
 						<label for="email">Email:</label><br/>
-						<input class="form-control" type="text" name="email" id="email" required="required"><br/>
+						<input class="form-control" type="text" name="email" id="email" required="required" placeholder="Email" onchange="checkEmail(this)">
+						<div class="invalid-feedback">Please enter your email</div>
+						<br/>
 					</div>	
+					<div class="col-sm-6">
+						<label for="email">Phone Number:</label><br/>
+						<input class="form-control" type="text" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)">
+						<div class="invalid-feedback">Please enter your phone number</div>
+						<br/>
+					</div>
 				</div>	
 				<div class="form-row ">
 	    			<div class="col-sm-6 mb-3">
 						<label for="address">Address:</label>
-						<input class="form-control" type="text" name="address" id="address" required="required"><br/>	
+						<input class="form-control" type="text" name="address" id="address" required="required" placeholder="Address">
+						<div class="invalid-feedback">Please enter your address</div><br/>	
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="city">City:</label><br/>
-						<input class="form-control" type="text" name="city" id="city" required="required">
+						<input class="form-control" type="text" name="city" id="city" required="required" placeholder="City">
+						<div class="invalid-feedback">Please enter your city</div>
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="prov">Province</label>
@@ -128,11 +144,13 @@
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="pCode">Postal Code:</label><br/>
-						<input class="form-control" type="text" name="pCode" id="pCode" required="required">
+						<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
+						<div class="invalid-feedback">Please enter your postal code</div>
 					</div>		
 				</div>	
 
-				<div class="text-left">
+				<!--Trip Information to be used on another page-->
+				<!--<div class="text-left">
 				<label for="triptype">Trip Type:</label>
 				</div>
 				<div class="custom-control custom-radio text-left">
@@ -174,7 +192,8 @@
 				  <div class="col-10">
 				    <input class="form-control" type="date" id="return">
 				  </div>
-				</div>
+				</div>-->
+
 				<div class="text-left">
 				<div class="form-check form-check-inline">
 		  			<input class="form-check-input" type="checkbox" name="sendInfo" value="sendSpam" checked="checked">
