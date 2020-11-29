@@ -9,7 +9,7 @@
 		<meta name="keywords" content="travel, travel experts, booking, vacation, package" />
     <meta name="author" content="Susan Trinh" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!--link rel="stylesheet" href="css/reset.css" --> <!-- reset removed by bob-->
+    
     <link rel="stylesheet" href="css/style.css" />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
 
@@ -20,7 +20,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     
-    <!-- Fancy Gallery Function Marked for Demise -->
+    <!-- Fancy Gallery Function [Susan]-->
     <script type="text/javascript">
       $(function() {
 
@@ -63,7 +63,30 @@
   <!-- Content -->
   <body>
 
-    <!-- Navigation -->
+    <!--Preloader - [Eric] -->
+    <div class="introWrap">
+      <div class="loadWrap">
+        <img class="loadLogo" src="../Media/sunlogo_animated.svg" alt="Logo animation courtesy of Vivus" />
+        <p class="loadLabel">Loading..</p>
+
+        <img class="planeAnimation" src="../Media/Plane.png" alt="" />
+
+        <div class="loadRevealer revealTop" ></div>                    
+        <div class="loadRevealer revealBottom" ></div>
+
+        <img class="introSplash" src="../Media/mizrach-beach.jpg" alt="" />
+        <h1 class="introText">Live. Your Way</h1>
+      </div>
+    </div>   
+
+    <div class="header">
+      <div class="info">
+          <h4>AN INTERNATIONAL TRAVEL AGENCY</h4>
+          <h1>WELCOME TO TRAVEL EXPERTS</h1>
+      </div>
+    </div>
+
+    <!-- [Susan] Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
       <a class="navbar-brand active" href="index.html">Travel Experts<span class="sr-only">(current)</span></a>
@@ -84,7 +107,7 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="packages.html">Ongoing Deals</a>
+            <a class="nav-link" href="#">Ongoing Deals</a>
           </li>
 
         </ul>
@@ -92,7 +115,8 @@
 
     </nav>
 
-    <section class="content intro">
+    <!-- Blurb [Eric] -->
+    <section class="content intro"> 
       <h2>The world is bigger than the maps would tell you.</h2>
       <br>
       <p>
@@ -111,7 +135,7 @@
     </section>
     
 
-    <!-- Gallery Section [Eric] - reorg'd layout for responsiveness, removed myterious p tags-->
+    <!-- Gallery Section [Susan] - [Eric] reorg'd layout for responsivenesss-->
     <section class="content gallery-wrap firstGallery">
 
       <div class="gallery">
@@ -163,5 +187,8 @@
       <h6>Copyright &#169 by Travel Experts 2020</h6>
     </footer>
 
+
+  <!-- Main scripts for the loader - put at the end so the transition only fires once everything above it has loaded -->
+	<script src="js/indexLoader.js"></script>
 	</body>
 </html>
