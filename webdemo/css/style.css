@@ -1,4 +1,4 @@
-/* All styles not otherwise marked by Susan */
+/* All styles not otherwise marked are by Susan */
 
 @import url('https://fonts.googleapis.com/css?family=Josefin+Sans:400,400i,600,600i');
 
@@ -15,7 +15,7 @@ a{
 }
 
 /*** Header and animation ***/
-/* example code for kenburns effect form https://codepen.io/nodws/pen/aWgMMQ */
+/* Susan -  example code for kenburns effect form https://codepen.io/nodws/pen/aWgMMQ */
 .header{
   position:relative;
   overflow:hidden;
