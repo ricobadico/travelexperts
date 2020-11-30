@@ -1,0 +1,17 @@
+body {
+  font-family: tacoma;
+  background-image: url("..//media/leaves3.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+
+.registrationForm {
+  border-radius: 25px;
+  padding: 20px ;
+  margin-bottom: 30px;
+  background-color: #f7f5ec;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
