@@ -15,17 +15,6 @@ app.engine('handlebars', handlebars({
     defaultLayout: "",
 }));
 
-// Open up the database for use.
-// Set up as a pool - if you use it, you don't need to call connection.connect(). 
-// You do still need to call connection.end() after use;
-const connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'root',
-    password : '',
-    database : 'travelexperts',
-    connectionLimit: 100,
-    multipleStatements: true
-});
 
 // Set up serving of static files
 // app.use("/static", express.static(path.join(__dirname, "static")));
@@ -43,30 +32,45 @@ app.get("/", (req, res)=>{
 
 // Feisty template render for Contact page, requires nested queries fed into a complicated template
 // It works but occasionally fails to pull from the db, I'll work on it
-app.get("/contacto", (req,res) => {
+app.get("/contact", (req,res) => {
+
+    // Open up the database for use.
+    const connection = mysql.createConnection({
+        host     : 'localhost',
+        user     : 'root',
+        password : '',
+        database : 'travelexperts',
+        multipleStatements: true
+    });
+
+    connection.connect();
 
     //Start building the array that will contain the data we need, in a form useful to handlebars
     let dynamicAgencyList = { Agencies: []};
 
-    // Query 1 : get the agencies
-    connection.query('SELECT * FROM agencies', async function (error, agencies) {
+    // Query 1 : get the data. results[0] is the array of agencies, results[1] the array of agents
+    connection.query('SELECT * FROM agencies; SELECT * from agents', function (error, results) {
         if (error) throw new Error ("Failed to load agency table from database");
+        const agencies = results[0];
+        const agents = results[1];
   
         // For each agency pulled up in that query, we've got some work to do
-        for(let i = 0; i < agencies.length; i++){ 
+        for(let i in agencies){ 
 
             // Add that agency as an entry to the agency array
             dynamicAgencyList.Agencies.push(agencies[i]);
 
             // Add an empty array element for agents (to be filled below)
             dynamicAgencyList.Agencies[i].agents= [];
+        }
 
-            // Query 2: want to get agents from within each agency (one agency at a time)
-            // We call the query (see getResult) and await its response - otherwise, the code will continue before the query finishes
-            agents = await getResult('SELECT * FROM agents WHERE AgencyId = ?', i+1 ).catch(() => console.error("Failed to load agent table from database."));
-        
-            // Then, add the resulting agents to the current agency
-            dynamicAgencyList.Agencies[i].agents = agents;
+        // Now we iterate through agents and assign them to their proper agencies
+        for(let j in agents){
+
+            homeAgency = agents[j].AgencyId;
+
+            // here, we are adding the current agent to the agency at the index corresponding to their id (which is -1)
+            dynamicAgencyList.Agencies[homeAgency-1].agents.push(agents[j]);
         }
 
         // We now have all the data needed to populate the template, in the form the template is expecting
@@ -74,19 +78,5 @@ app.get("/contacto", (req,res) => {
         connection.end();
     }); 
 });
-
-// This helper function makes an sql query as a Promise - a value that changes based on whether the result succeeded, failed, or
-// hasn't yet completed. Importantly, we can call this inside an async function above and wait for the result before continuing.
-function getResult(sql, placeholder){
-    return new Promise(function(resolve,reject){
-      connection.query(sql, placeholder, function(err, result){
-        if(err){
-          reject(new Error ("Failed to connect to agents table of database"));
-        }else{
-          resolve(result)
-        }
-      });
-    });
-  }
 
 

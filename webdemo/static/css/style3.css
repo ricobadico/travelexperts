@@ -27,11 +27,12 @@
 
 .our-team.agency-container .peek-up {
   display:flex;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .our-team.agency-container .peek-up *{
   text-align: center;
+  margin: 0 0.5em;
 }
 
 .our-team h2{
