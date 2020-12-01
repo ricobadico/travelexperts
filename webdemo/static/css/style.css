@@ -69,7 +69,8 @@ a{
   width:100%;
   padding:10% 0 10% 0;
   text-align:center;
-  text-shadow:0 2px 3px rgba(0,0,0,0.2)
+  text-shadow:0 2px 3px rgba(0,0,0,0.2);
+
 }
 .info h4, .meta{
   font-size:3vw
