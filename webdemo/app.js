@@ -15,6 +15,18 @@ app.engine('handlebars', handlebars({
     defaultLayout: ""
 }));
 
+// Open up the database for use.
+// Set up as a pool - if you use it, you don't need to call connection.connect(). 
+// You do still need to call connection.end() after use;
+const connection = mysql.createPool({
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    database : 'travelexperts',
+    connectionLimit: 100
+});
+
+// Set up serving of static files
 // app.use("/static", express.static(path.join(__dirname, "static")));
 app.use(express.static("static", {extensions: ["html", "htm", "css", "js"]}));
 app.use(express.static("static/media", {extensions: ["jpg", "png", "svg"]}));
