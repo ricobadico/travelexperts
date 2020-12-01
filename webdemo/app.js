@@ -18,12 +18,13 @@ app.engine('handlebars', handlebars({
 // Open up the database for use.
 // Set up as a pool - if you use it, you don't need to call connection.connect(). 
 // You do still need to call connection.end() after use;
-const connection = mysql.createPool({
+const connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
     password : '',
     database : 'travelexperts',
-    connectionLimit: 100
+    connectionLimit: 100,
+    multipleStatements: true
 });
 
 // Set up serving of static files
@@ -40,7 +41,8 @@ app.get("/", (req, res)=>{
     res.sendFile(__dirname +"/static/index.html");
 });
 
-// Fiesty template render for Contact page, requires nested queries fed into a complicated template
+// Feisty template render for Contact page, requires nested queries fed into a complicated template
+// It works but occasionally fails to pull from the db, I'll work on it
 app.get("/contacto", (req,res) => {
 
     //Start building the array that will contain the data we need, in a form useful to handlebars
@@ -61,8 +63,7 @@ app.get("/contacto", (req,res) => {
 
             // Query 2: want to get agents from within each agency (one agency at a time)
             // We call the query (see getResult) and await its response - otherwise, the code will continue before the query finishes
-            agents = await getResult('SELECT * FROM agents WHERE AgencyId = ?', i+1 ) // we add 1 since agencies index starts at 0, but agencyid starts at 1
-            .catch(err => console.error(err));
+            agents = await getResult('SELECT * FROM agents WHERE AgencyId = ?', i+1 ).catch(() => console.error("Failed to load agent table from database."));
         
             // Then, add the resulting agents to the current agency
             dynamicAgencyList.Agencies[i].agents = agents;
@@ -85,7 +86,7 @@ function getResult(sql, placeholder){
           resolve(result)
         }
       });
-    })
+    });
   }
 
 

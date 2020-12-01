@@ -26,9 +26,8 @@
 }
 
 .our-team.agency-container .peek-up {
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-  justify-content: center;
+  display:flex;
+  justify-content: space-between;
 }
 
 .our-team.agency-container .peek-up *{
@@ -130,4 +129,9 @@
 
 .our-team .peek-up li {
   display: inline-block;
+}
+
+.row {
+  display: grid;
+  justify-content: center;
 }
