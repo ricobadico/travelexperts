@@ -12,7 +12,7 @@ app.set('view engine', 'handlebars');
 // Handlebars needs this engine line to configure it and work properly
 app.engine('handlebars', handlebars({
     extname: "handlebars",
-    defaultLayout: ""
+    defaultLayout: "",
 }));
 
 // Open up the database for use.
@@ -41,7 +41,7 @@ app.get("/", (req, res)=>{
 });
 
 // Fiesty template render for Contact page, requires nested queries fed into a complicated template
-app.get("/contact", (req,res) => {
+app.get("/contacto", (req,res) => {
 
     //Start building the array that will contain the data we need, in a form useful to handlebars
     let dynamicAgencyList = { Agencies: []};
@@ -69,7 +69,7 @@ app.get("/contact", (req,res) => {
         }
 
         // We now have all the data needed to populate the template, in the form the template is expecting
-        res.render(__dirname + '/webdemo/views/contact.handlebars', dynamicAgencyList);
+        res.render(__dirname + '/views/contact.handlebars', dynamicAgencyList);
         connection.end();
     }); 
 });
@@ -84,7 +84,7 @@ function getResult(sql, placeholder){
         }else{
           resolve(result)
         }
-      }).catch(alert);
+      });
     })
   }
 
