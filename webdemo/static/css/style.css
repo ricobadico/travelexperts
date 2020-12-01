@@ -1,0 +1,306 @@
+/* All styles not otherwise marked are by Susan */
+
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans:400,400i,600,600i');
+
+html,body{
+  margin:0;
+  height:120%;
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+a{
+  text-decoration:none;
+  display:flex;
+  flex-wrap: wrap;
+}
+
+/*** Header and animation ***/
+/* Susan -  example code for kenburns effect form https://codepen.io/nodws/pen/aWgMMQ */
+.header{
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: flex-start;
+  height:35vw;
+  min-height:auto; /* [Eric] - changed from fixed height to ensure no extra space beneath on mobile*/
+  max-height:1000px;
+  min-width:100%;
+  color:#eee;
+}
+
+.header:after{
+  content:"";
+  width:100%;
+  height:100%;
+  position:absolute;
+  bottom:0;
+  left:0;
+  z-index:-1;
+}
+
+.header:before{
+  content:"";
+  width:100%;
+  height:200%;
+  position:absolute;
+  top:0;
+  left:0;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0); backface-visibility: hidden;
+  scale:(1.0, 1.0);
+  transform: translateZ(0);
+  background:#1B2030 url("../media/mountains.jpg") 50% 0 no-repeat;
+  background-size:100%;
+  background-attachment:fixed;
+  animation: grow 290s linear 10ms alternate infinite; /* fixKenBurns bob*/
+  transition:all 0.6s ease-in-out;
+  z-index:-2
+}
+
+@keyframes grow{
+	0% { transform: scale(1) translateY(-15%)}
+	45% { transform: scale(1.2) translateY(-45%)} /* fixKenBurns bob*/
+}
+
+.info{
+  width:100%;
+  padding:10% 0 10% 0;
+  text-align:center;
+  text-shadow:0 2px 3px rgba(0,0,0,0.2);
+
+}
+.info h4, .meta{
+  font-size:3vw
+}
+.info h1, .meta{
+  font-size:5vw
+}
+.meta{
+  font-style:italic;
+}
+
+/*** Main section ***/
+/* Intro Blurb */
+.content{  
+  text-align:justify;
+  margin: 4em auto 2em;
+}
+
+.intro {
+  text-align: center;
+  width:80%;
+  max-width: 850px;
+}
+
+.intro h2{
+  margin-bottom: 1em;
+}
+
+.intro p{
+  font-size: larger;
+  margin-bottom: 2em;
+}
+
+.intro h4 {
+  margin-top: 4em;
+}
+
+/* Image galleries */
+.content.firstGallery{
+  margin-top: 1em;
+}
+
+.gallery {
+  overflow: hidden;
+  position: relative;
+  /* [Eric] - set responsive size, then used grid to make children behave */
+  /* This also fixed header issues */
+  min-width:300px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 300px);
+  justify-content: center;
+  justify-items: center;
+}
+
+.gallery-wrap{ /* [Eric] Further adding an outer wrapper and spliiting up galleries intoo 2-image chunks to prevent uneven numbers in rows*/
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 600px));
+  justify-content: center;
+}
+
+.img-c {
+  width: 300px;
+  height: 300px;
+  float: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.img-w {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  transition: transform ease-in-out 300ms;
+}
+
+.img-w img {
+  display: none;
+}
+
+.img-c {
+    transition: width ease 400ms, height ease 350ms, left cubic-bezier(0.4, 0, 0.2, 1) 420ms, top cubic-bezier(0.4, 0, 0.2, 1) 420ms;
+}
+
+.img-c:hover .img-w {
+  transform: scale(1.08);
+  transition: transform cubic-bezier(0.4, 0, 0.2, 1) 450ms;
+}
+
+.img-c.active {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+  z-index: 2;
+  /* transform: translateX(-50%); */
+}
+
+.img-c.postactive {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.img-c.active.positioned {
+  left: 0 !important;
+  top: 0 !important;
+  transition-delay: 50ms;
+}
+
+/* Loader Stylings [Eric] */
+
+.loadWrap { /* container that puts load logo and text at center of screen*/
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1400;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.loadLogo {
+  width: 30%;
+  min-width:300px;
+  z-index: 1500;
+}
+
+.loadLabel {
+  width: min-content;
+  margin: 0 auto;
+  z-index: 1500;
+  font-size: xx-large;
+  font-style: italic;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  
+}
+
+.loadRevealer { /* Each of the two revealers take up just over half the screen and will be animated to reveal the page */
+  position:fixed;
+  left:0;
+  width:100%;
+  height: 51%;
+  background: whitesmoke;
+  z-index: 1000;
+}
+
+.loadRevealer.revealTop { /* Fixed to upper half of loader */
+   top:0
+}
+
+.loadRevealer.revealBottom { /* Fixed to bottom half */
+   bottom:0;
+}
+
+.planeAnimation { /*starts just behind the left side of the screen, a transition below flies it accross*/
+  position:fixed;
+  width:200px;
+  left:-200px;
+  z-index: 1100;
+}
+
+.introSplash { /*the full-page image revealed by the loader */
+  position: fixed;
+  min-width: 100%;
+  height:100%;
+  width: auto;
+}
+
+.introText {
+  position: fixed;
+  top:20%;
+  font-family: Helvetica;
+  font-size: 15vmin;
+  text-align: center;
+  color:white;
+  opacity: 0.7;
+}
+
+/* Loaded Styles [Eric] */
+.loaded .loadLogo, .loaded .loadLabel { /* fades out loaded class added to body */
+  opacity: 0;
+
+  /*animation: 0-0.3s*/
+  transition: all 0.3s ease-out;
+}
+
+.loaded .planeAnimation { /* flies more than the width of the viewport immediately after logo fades, zoomzooom */
+  transform: translateX(170vw);
+
+  /*animation:0.5-1.2s */
+  transition: all 0.5s 0.7s ease-out;
+}
+
+.loaded .loadWrap .loadRevealer.revealTop{ /* When .loaded class added, translates up off screen */
+  transform: translateY(-100%);
+
+  /*animation: 0.8-1,5s */
+  transition: all 0.7s 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+.loaded .loadWrap .loadRevealer.revealBottom{  /* When .loaded class added, translates down off screen */
+  transform: translateY(100%);
+
+  /*animation: 0.8-1,5s */
+  transition: all 0.7s 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.loaded .introText { /* fades out */
+  opacity: 0;
+
+  /*animation: 0-0.3s*/
+  transition: all 0.3s 5s ease-out;
+
+}
+
+.loaded .introSplash { /* adds a Ken Burns effect to image */
+  transform: scale(1.1) translate(-.5%, 2%);
+
+  /*animation: .8s to 5.3s */
+  transition: all 4.5s 0.8s ease-out;
+}
+
+.loaded .loadWrap { /* hides and goes offscreen onload */
+  opacity: 0;
+
+  transform: translateX(300%);
+
+  /*animation: 5.5-6.8 */
+  transition: opacity 0.3s 5.5s ease-out, transform 0.3s 6.5s ease-out;
+}

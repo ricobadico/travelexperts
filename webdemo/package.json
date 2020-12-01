@@ -1,0 +1,17 @@
+{
+  "name": "webdemo",
+  "version": "1.0.0",
+  "description": "Source control for the Travel Experts Website demo",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-handlebars": "^5.2.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.6"
+  }
+}
