@@ -1,5 +1,5 @@
 body {
-  font-family: tacoma;
+  font-family: tahoma;
   background-image: url("..//media/leaves3.jpg");
   background-size: cover;
   background-position: center;
@@ -14,4 +14,18 @@ body {
   text-align: center;
   overflow: hidden;
   position: relative;
+}
+
+.bg-input {
+    background-color:#B9EEFB;
+}
+
+
+.jumbotron{
+    margin-top:15px;
+    max-width: 100%;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    color: inherit;
+    background-color: #D3D3D3;
 }

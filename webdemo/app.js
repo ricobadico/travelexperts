@@ -39,18 +39,18 @@ app.listen(PORT, () => {
 });
 
 // Serves up index.html on the root
-app.get("/", (req, res) => {
+app.get("/index", (req, res) => {
   res.sendFile(__dirname + "/static/index.html");
 });
 
 app.get("/register", (req, res) => {
-  res.sendFile(__dirname + "/static/register.html");
+  res.render("register");
 });
 
 app.get("/packages", (req, res) => {
   res.sendFile(__dirname + "/static/packages.html");
 });
-app.get("/home", (req, res) => {
+app.get("/", (req, res) => {
   res.render("home");
 });
 
