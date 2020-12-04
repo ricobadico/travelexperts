@@ -2,9 +2,13 @@ const express = require("express");
 const path = require("path");
 const handlebars = require("express-handlebars");
 const mysql = require("mysql");
+const dotenv = require("dotenv");
+
+//Load Config
+dotenv.config({ path: "./.env", debug: true });
 
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 //  Set handlebars as view engine
 app.set("view engine", "handlebars");
@@ -35,7 +39,9 @@ app.use(
 );
 */
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(
+    `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`
+  );
 });
 
 // Serves up index.html on the root
