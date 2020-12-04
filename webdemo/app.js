@@ -2,23 +2,20 @@ const express = require("express");
 const path = require("path");
 const handlebars = require("express-handlebars");
 const mysql = require("mysql");
-const dotenv = require("dotenv");
+//const dotenv = require("dotenv");
 
 //Load Config
-dotenv.config({ path: "./.env", debug: true });
+//dotenv.config({ path: "./.env", debug: true });
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+//const PORT = process.env.PORT || 8000;
+const PORT = 8000;
 
 //  Set handlebars as view engine
 app.set("view engine", "handlebars");
 // Handlebars needs this engine line to configure it and work properly
-app.engine(
-  "handlebars",
-  handlebars({
-    extname: "handlebars",
-  })
-);
+// prettier-ignore
+app.engine("handlebars", handlebars({extname: "handlebars"}));
 
 // Set up serving of static files
 //app.use("/static", express.static(path.join(__dirname, "public")));
@@ -63,13 +60,14 @@ app.get("/", (req, res) => {
 // Feisty template render for Contact page, requires nested queries fed into a complicated template
 // It works but occasionally fails to pull from the db, I'll work on it
 app.get("/contact", (req, res) => {
+  // prettier-ignore
   // Open up the database for use.
   const connection = mysql.createConnection({
-    host: "127.0.0.1",
+    host: "localhost",
     user: "root",
     password: "",
     database: "travelexperts",
-    multipleStatements: true,
+    multipleStatements: true
   });
 
   connection.connect();
@@ -106,8 +104,9 @@ app.get("/contact", (req, res) => {
     }
 
     // We now have all the data needed to populate the template, in the form the template is expecting
+    // prettier-ignore
     res.render(__dirname + "/views/contact.handlebars", dynamicAgencyList, {
-      layout: false,
+      layout: false
     });
     connection.end();
   });
