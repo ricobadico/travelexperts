@@ -43,6 +43,13 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/static/index.html");
 });
 
+app.get("/register", (req, res) => {
+  res.sendFile(__dirname + "/static/register.html");
+});
+
+app.get("/packages", (req, res) => {
+  res.sendFile(__dirname + "/static/packages.html");
+});
 app.get("/home", (req, res) => {
   res.render("home");
 });
