@@ -12,6 +12,7 @@ body {
   background-image: url("..//media/leaves3.jpg");
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
 }
 
 
