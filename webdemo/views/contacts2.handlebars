@@ -1,4 +1,3 @@
-<body>
 
 	<link rel="stylesheet" href="/css/style3.css">
 	<div class="jumbotron text-center"  style="margin-bottom:0">
@@ -10,6 +9,7 @@
 
 	{{> navbar}}
 
+
 	<br/><br/>
 	{{!-- Here comes the template. The #each is going to iterate through an array of multiple agencies --}}
 	{{#each Agencies}}
@@ -17,7 +17,7 @@
 		<div class="our-team agency-container">
 			<div class="agency-center">
 				<div class="picture">
-					<img class="img-fluid" src="/media/{{this.AgncyCity}}.jpg">
+					<img class="img-fluid" src="../media/{{this.AgncyCity}}.jpg">
 				</div>
 				<h2 style="display:block">Travel Experts {{this.AgncyCity}}</h2>
 				<div class=peek-up>
@@ -33,7 +33,7 @@
 	    	<div class="col-12 col-sm-6 col-md-4 col-lg-3">
 		      <div class="our-team">
 		        <div class="picture">
-		        	<img class="img-fluid" src="/media/{{this.AgtFirstName}}.jpg">
+		        	<img class="img-fluid" src="../Media/{{this.AgtFirstName}}.jpg">
 		        </div>
 		        <h3 class="name">{{this.AgtFirstName}} {{this.AgtLastName}}</h3>
 		        <h4 class="title">{{this.AgtPosition}}</h4>
@@ -49,6 +49,3 @@
 	    </div>
 	</div>	
 	{{/each}}
-
-	
-</body>
