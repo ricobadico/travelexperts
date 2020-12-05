@@ -42,18 +42,21 @@ app.listen(PORT, () => {
 });
 
 // Serves up index.html on the root
-app.get("/index", (req, res) => {
-  res.sendFile(__dirname + "/static/index.html");
-});
+//app.get("/index", (req, res) => {
+//  res.sendFile(__dirname + "/static/index.html");
+//});
 
 app.get("/register", (req, res) => {
+  console.log("render register");
   res.render("register");
 });
 
 app.get("/packages", (req, res) => {
-  res.sendFile(__dirname + "/static/packages.html");
+  console.log("render packages");
+  res.render("packages");
 });
 app.get("/", (req, res) => {
+  console.log("render home");
   res.render("home");
 });
 
@@ -63,7 +66,7 @@ app.get("/contact", (req, res) => {
   // prettier-ignore
   // Open up the database for use.
   const connection = mysql.createConnection({
-    host: process.env.HOST,
+    host: process.env.DB_HOST,
     user: "root",
     password: "password",
     database: "travelexperts",
