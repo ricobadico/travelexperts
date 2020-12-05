@@ -13,20 +13,19 @@
   
 <br/><br/>
 
-
 <div class="container">
 <div class="registrationForm">	
-		<form method="POST" action="bouncer.php" class="needs-validation" novalidate>
+		<form method="POST" action="registerPOST" class="needs-validation" novalidate>
 			<h4 class="text-center">Registration Form</h4>
 				<div class="form-row ">
 	    			<div class="col-sm-6 ">
 						<label for="firstName">First Name:</label><br/>
-						<input class="form-control bg-input" type="text" name="firstName" id="firstName" required="required" placeholder="First Name">
+						<input class="form-control" type="text" name="firstName" id="firstName" required="required" placeholder="First Name">
 						<div class="invalid-feedback">Please enter your first name</div><br/>
 					</div>	
 					<div class="col-sm-6 ">
 						<label for="lastName">Last Name:</label><br/>
-						<input class="form-control bg-input" type="text" name="lastName" id="lastName" required="required" placeholder="Last Name">
+						<input class="form-control" type="text" name="lastName" id="lastName" required="required" placeholder="Last Name">
 						<div class="invalid-feedback">Please enter your last name</div>
 					</div>
 				</div>
@@ -37,14 +36,14 @@
 						<div class="input-group-prepend">
 	          				<span class="input-group-text" id="inputGroupPrepend">@</span>
 	        			</div>
-						<input class="form-control bg-input" type="text" name="userName" id="userName" required="required" placeholder="Username">
+						<input class="form-control" type="text" name="userName" id="userName" required="required" placeholder="Username">
 						<div class="invalid-feedback">Please enter a username</div>
 						<br/>
 						</div>	
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="pwd">Password:</label><br/>
-						<input class="form-control bg-input" type="password" name="pwd" id="pwd" required="required" placeholder="Password">
+						<input class="form-control" type="password" name="pwd" id="pwd" required="required" placeholder="Password">
 						<div class="invalid-feedback">Please enter a password</div>
 					</div>	
 				</div>	
@@ -52,13 +51,13 @@
 				<div class="form-row">	
 	    			<div class="col-sm-6">
 						<label for="email">Email:</label><br/>
-						<input class="form-control bg-input" type="text" name="email" id="email" required="required" placeholder="Email" onchange="checkEmail(this)">
+						<input class="form-control" type="text" name="email" id="email" required="required" placeholder="Email" onchange="checkEmail(this)">
 						<div class="invalid-feedback">Please enter your email</div>
 						<br/>
 					</div>	
 					<div class="col-sm-6">
 						<label for="email">Phone Number:</label><br/>
-						<input class="form-control bg-input" type="text" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)">
+						<input class="form-control" type="text" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)">
 						<div class="invalid-feedback">Please enter your phone number</div>
 						<br/>
 					</div>
@@ -66,17 +65,17 @@
 				<div class="form-row ">
 	    			<div class="col-sm-6 mb-3">
 						<label for="address">Address:</label>
-						<input class="form-control bg-input" type="text" name="address" id="address" required="required" placeholder="Address">
+						<input class="form-control" type="text" name="address" id="address" required="required" placeholder="Address">
 						<div class="invalid-feedback">Please enter your address</div><br/>	
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="city">City:</label><br/>
-						<input class="form-control bg-input" type="text" name="city" id="city" required="required" placeholder="City">
+						<input class="form-control" type="text" name="city" id="city" required="required" placeholder="City">
 						<div class="invalid-feedback">Please enter your city</div>
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="prov">Province</label>
-					    <select class="form-control bg-input" name="prov" id="prov" required="required">
+					    <select class="form-control" name="prov" id="prov" required="required">
 					      <option>AB</option>
 					      <option>BC</option>
 					      <option>MB</option>
@@ -94,23 +93,10 @@
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="pCode">Postal Code:</label><br/>
-						<input class="form-control bg-input" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
+						<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
 						<div class="invalid-feedback">Please enter your postal code</div>
 					</div>		
 				</div>	
-
-				<div class="form-group row">
-				  <label for="departure" class="col-2 col-form-label">Departure Date</label>
-				  <div class="col-10">
-				    <input class="form-control" type="date" id="departure">
-				  </div>
-				</div>
-				<div class="form-group row ">
-				  <label for="return" class="col-2 col-form-label">Return Date</label>
-				  <div class="col-10">
-				    <input class="form-control" type="date" id="return">
-				  </div>
-				</div>
 
 				<div class="text-left">
 				<div class="form-check form-check-inline">
@@ -119,7 +105,7 @@
 				</div>	<br/><br/>
 				
 		    	<label for="comments">Additional Comments:</label>
-		    	<textarea class="form-control bg-input" id="addCom" rows="3"></textarea><br/><br/>
+		    	<textarea class="form-control" id="addCom" rows="3"></textarea><br/><br/>
 		    </div>
 		  		
 				<input class="btn btn-info" type="submit" value="Send Registration" onclick="return confirm('Please confirm all information is accurate upon submission')"/>
@@ -128,4 +114,5 @@
 </div>		
 </div>
 <script src="js/script.js"></script>	
+<script src="js/script2.js"></script>	
 </body>
