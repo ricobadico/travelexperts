@@ -59,8 +59,9 @@ app.get("/packages", (req, res) => {
 
 app.get("/", (req, res) => {
   //res.writeHead(200, { "Content-Type": "text/html" });
+  console.log(req.query);
   console.log("render home");
-  res.render("home");
+  res.render("home", { skipIntro: req.query.skipIntro });
 });
 
 // Feisty template render for Contact page, requires nested queries fed into a complicated template

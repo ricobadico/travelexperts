@@ -18,7 +18,9 @@ html,body{
 body {
 
     background-image: url("/media/Muse1.jpg");
-    background-size: cover; /* bob there was a trailing `/*` here and display and align-items:... */
+    background-size: cover;
+    background-attachment: fixed;
+    /* bob there was a trailing `/*` here and display and align-items:... */
     /*  not beign applied, if applied they breadk the page */
     /*background-position: center;*/ /*originally commented*/ 
     /*display: flex;*/ /* not applied originally*/
@@ -159,6 +161,5 @@ body {
 }
 
 .row {
-  /*display: grid;*/
   justify-content: center;
 }
