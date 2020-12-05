@@ -2,14 +2,14 @@ const express = require("express");
 const path = require("path");
 const handlebars = require("express-handlebars");
 const mysql = require("mysql");
-//const dotenv = require("dotenv");
+const dotenv = require("dotenv");
 
 //Load Config
-//dotenv.config({ path: "./.env", debug: true });
+dotenv.config({ path: "./.env", debug: true });
 
 const app = express();
-//const PORT = process.env.PORT || 8000;
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
+//const PORT = 8000;
 
 //  Set handlebars as view engine
 app.set("view engine", "handlebars");
@@ -63,11 +63,12 @@ app.get("/contact", (req, res) => {
   // prettier-ignore
   // Open up the database for use.
   const connection = mysql.createConnection({
-    host: "localhost",
+    host: process.env.HOST,
     user: "root",
-    password: "",
+    password: "password",
     database: "travelexperts",
-    multipleStatements: true
+    multipleStatements: true,
+    insecureAuth: true
   });
 
   connection.connect();
@@ -102,12 +103,11 @@ app.get("/contact", (req, res) => {
       // here, we are adding the current agent to the agency at the index corresponding to their id (which is -1)
       dynamicAgencyList.Agencies[homeAgency - 1].agents.push(agents[j]);
     }
+    //console.log(agents);
 
     // We now have all the data needed to populate the template, in the form the template is expecting
     // prettier-ignore
-    res.render(__dirname + "/views/contact.handlebars", dynamicAgencyList, {
-      layout: false
-    });
+    res.render(path.join(__dirname, "/views/contacts2.handlebars"), dynamicAgencyList);
     connection.end();
   });
 });
