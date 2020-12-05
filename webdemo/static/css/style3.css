@@ -159,6 +159,6 @@ body {
 }
 
 .row {
-  display: grid;
+  /*display: grid;*/
   justify-content: center;
 }

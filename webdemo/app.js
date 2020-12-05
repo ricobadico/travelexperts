@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const handlebars = require("express-handlebars");
 const mysql = require("mysql");
+const morgan = require("morgan");
 const dotenv = require("dotenv");
 
 //Load Config
@@ -9,6 +10,9 @@ dotenv.config({ path: "./.env", debug: false });
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 
 const PORT = process.env.PORT || 8000;
 
@@ -54,6 +58,7 @@ app.get("/packages", (req, res) => {
 });
 
 app.get("/", (req, res) => {
+  //res.writeHead(200, { "Content-Type": "text/html" });
   console.log("render home");
   res.render("home");
 });
