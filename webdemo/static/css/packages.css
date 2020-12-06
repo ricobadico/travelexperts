@@ -2,24 +2,27 @@
 
 html,body{
   margin:0;
-  height:120%;
+  height:100%;
   font-family: 'Josefin Sans', sans-serif;
 }
 
 body {
-   /* font-family: Arial, Helvetica, sans-serif; */
-    background-color: #D3D3D3;
+   background-image: url("..//media/plane1.jpg"); /* Photo by Matheus Frade on Unsplash */
+   background-size: cover;
+   background-position: center;
+   background-attachment: fixed; 
+   
 }
 * {box-sizing: border-box;}
 
-h1{
+/* h1{
     text-align: center;
     box-shadow: 0 5px 10px rgba(90, 90, 90, .6);
     margin-top: 0;
     padding: 10px;
     background-color: #b6b6b6;
     margin-bottom: 50px;
-}
+} */
 
 
 .bg-img {
@@ -75,6 +78,7 @@ h1{
     justify-content: center;
     column-gap: 100px;
     row-gap: 50px;
+    margin-top: 40px;
     
 }
 
@@ -101,7 +105,7 @@ h1{
     flex-wrap: nowrap;
     justify-content: space-around;
     align-items: center;
-    background-color: #b6b6b6;
+    background-color: rgba(247,245,236,.9);
 }
 
 .package-desc {
@@ -114,7 +118,7 @@ h1{
 
 footer {
     height: 36px;
-    background-color: #b6b6b6;
+    background-color: rgba(247,245,236,.9);
     display:flex;
     justify-content: flex-end;
     align-items: center;
