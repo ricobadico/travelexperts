@@ -2,22 +2,58 @@ const express = require("express");
 const path = require("path");
 const handlebars = require("express-handlebars");
 const mysql = require("mysql");
+const morgan = require("morgan");
 const dotenv = require("dotenv");
+<<<<<<< HEAD
 // Random function helper used to get random splashpage image
 const { randomNum } = require("./static/js/randomNum.js")
+=======
+const redis = require("redis");
+const session = require("express-session");
+const uuid = require("uuid");
+>>>>>>> templateTestBob
 
-//Load Config
-dotenv.config({ path: "./.env", debug: false });
+let RedisStore = require("connect-redis")(session);
+let redisClient = redis.createClient();
 
 const app = express();
-app.use(express.urlencoded({ extended: true }));
+// In memory cache / data store
 
+//Load Config Environment variables
+dotenv.config({ path: "./.env", debug: false });
 const PORT = process.env.PORT || 8000;
 
-// Open up the database for use. Any express method call can use this 'connection' variable, but needs to connect and end it's particular connection instance! (see existing examples)
+// Setup Express Middleware ---------------------------------//
+
+app.use(express.urlencoded({ extended: true })); // parse url
+if (process.env.NODE_ENV === "development") {
+  // log req res in dev
+  app.use(morgan("dev"));
+}
+//  Set handlebars as view engine
+app.set("view engine", "handlebars");
+app.engine("handlebars", handlebars({ extname: "handlebars" }));
+// prettier-ignore
+// session to identify unique client session and login auth
+app.use( 
+  session({
+    genid : (req) => {
+        return uuid.v4();
+    },
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {},
+    store: new RedisStore({ client: redisClient})
+  })
+);
+app.use("/", express.static(path.join(__dirname, "static")));
+
+//  HELPERS ---------------------------------//
+
 // prettier-ignore
 const getConnection = () => {
-
+    // Open up the database for use. Any express method call can use this 'connection' variable, but needs to connect and end it's particular connection instance! (see existing examples)
     let connection = mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
@@ -28,23 +64,14 @@ const getConnection = () => {
     return connection;
 }
 
-//  Set handlebars as view engine
-app.set("view engine", "handlebars");
-// Handlebars needs this engine line to configure it and work properly
-// prettier-ignore
-app.engine("handlebars", handlebars({extname: "handlebars"}));
-
-// Set up serving of static files
-//app.use("/static", express.static(path.join(__dirname, "public")));
-app.use("/", express.static(path.join(__dirname, "static")));
-
+// Start the express server listen for requests and send responses
 app.listen(PORT, () => {
   console.log(
     `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`
   );
 });
 
-// Define our routes and render templates
+// ROUTES ---------------------------------//
 app.get("/register", (req, res) => {
 
   // This data gets passed into the template (in this case, for the header)
@@ -63,12 +90,28 @@ app.get("/packages", (req, res) => {
 });
 
 app.get("/", (req, res) => {
+  //res.writeHead(200, { "Content-Type": "text/html" });
   console.log(req.query);
   console.log("render home");
   // the home page is injected with some values that determine whether the intro happens, and what splash image to show
   res.render("home", { skipIntro: req.query.skipIntro, introSplashNumber : `${randomNum(6)}`});
 });
 
+// for testing the login
+app.get("/login", (req, res, next) => {
+  if (req.session.views) {
+    req.session.views++;
+    res.setHeader("Content-Type", "text/html");
+    res.write("<p>views: " + req.session.views + "</p>");
+    res.write("<p>expires in: " + req.session.cookie.maxAge / 1000 + "s</p>");
+    console.log(`This sessions unique id: ${req.session.id}`);
+    res.end();
+  } else {
+    req.session.views = 1;
+    console.log(`This sessions unique id: ${req.session.id}`);
+    res.end("welcome to the session demo. refresh!");
+  }
+});
 // Feisty template render for Contact page, requires nested queries fed into a complicated template
 // It works but occasionally fails to pull from the db, I'll work on it
 app.get("/contact", (req, res) => {
