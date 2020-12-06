@@ -1,4 +1,5 @@
 const express = require("express");
+const mysql = require("mysql");
 const path = require("path");
 const handlebars = require("express-handlebars");
 const getConnection = require("./models/db.js");
@@ -8,6 +9,8 @@ const dotenv = require("dotenv");
 const redis = require("redis");
 const session = require("express-session");
 const uuid = require("uuid");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 const RedisStore = require("connect-redis")(session);
 const redisClient = redis.createClient();
@@ -55,11 +58,11 @@ app.listen(PORT, () => {
 });
 
 //test
-auth.genPasswordHash("password");
-auth.checkPasswordHash(
-  "password",
-  `$2b$10$xpW2q/66FpNC6TjGDp3onehApNj5iiNwC/9s9vHsaWmKcxi470TpO`
-);
+//auth.genPasswordHash("password");
+//auth.checkPasswordHash(
+//  "password",
+//  `$2b$10$xpW2q/66FpNC6TjGDp3onehApNj5iiNwC/9s9vHsaWmKcxi470TpO`
+//);
 
 // ROUTES ---------------------------------//
 app.get("/register", (req, res) => {
@@ -164,6 +167,7 @@ app.get("/contact", (req, res) => {
 // Insert the Register data into the database. All the Register page form needs to do is have "registerPOST" as its action to fire this off
 app.post("/registerPOST", (req, res) => {
   // This is just fancy "javascript destructuring": assigns these variables to the corresponding properties of the req.body object
+  // prettier-ignore
   let {
     firstName,
     lastName,
@@ -175,7 +179,7 @@ app.post("/registerPOST", (req, res) => {
     city,
     prov,
     pCode,
-    sendInfo,
+    sendInfo
   } = req.body;
   console.log(req.body);
   // Use the defined connection config to connect
@@ -189,29 +193,76 @@ app.post("/registerPOST", (req, res) => {
   //INSERT A NEW ENTRY INTO [a database table] (data,for,this,list,of,columns) THESE VALUE (one,datum,for,each,column,respectively)
   let sql =
     "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal` , `CustBusPhone`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  //prettier-ignore
+  let inserts = [
+    firstName,
+    lastName,
+    email,
+    pNumber,
+    address,
+    city,
+    prov,
+    pCode,
+    pNumber
+  ];
+  sql = mysql.format(sql, inserts);
+  console.log(sql);
 
   // Use a mysql connection's built-in query function to query the database. First argument is the SQL query, second argument defines placeholders ('?') in that query.
   // Third argument is the callback that happens once you've successfully gotten back the data (or an error) from the database
-  let result = connection.query(
-    sql,
-    [firstName, lastName, email, pNumber, address, city, prov, pCode, pNumber],
-    function (error, result) {
-      if (error) {
-        connection.end();
-        console.log(error);
-        throw Error;
-      }
-
-      // We're going to leave a console.log here just so anyone on the server can confirm that something happened
-      console.log(result);
-
-      // We've done what we needed and can close the mysql connection!
+  let recordId;
+  connection.query(sql, (error, result) => {
+    console.log("hi");
+    if (error) {
       connection.end();
-
-      // The user sent a request "/registerPOST" and is expecting a response! You need to tell the response to do something before we finish this express method call.
-      // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
-      console.log("returning home after register post");
-      res.render("home");
+      console.log(error);
+      throw Error;
     }
-  );
+    console.log("hello");
+    // We're going to leave a console.log here just so anyone on the server can confirm that something happened
+    recordId = result.insertId;
+    console.log(result.insertId);
+
+    connection.end();
+    // if the customer was inserted we take that record and
+    // use it insert and save the salted password hash to the db.
+    bcrypt.hash(pwd, saltRounds, (err, hash) => {
+      // Store hash in your password DB.
+      if (err) {
+        console.error(err);
+        console.log("unable to hash new password!");
+        return false; // continue
+      } else {
+        console.log(hash);
+        // Open a new connection and attempt the query
+        let connection2 = getConnection();
+        connection2.connect();
+        sql =
+          "INSERT INTO `web_credentials` (`CustomerId`, `Username`, `Hash`) VALUES (?,?,?)";
+        inserts = [recordId, userName, hash];
+        sql = mysql.format(sql, inserts);
+        console.log(sql);
+        connection2.query(sql, (err, result) => {
+          if (err) {
+            connection2.end();
+            console.error(err);
+            throw Error;
+          } else {
+            console.log("insert web Cred success");
+            console.log(result.insertId);
+            connection2.end();
+          }
+        });
+      }
+    });
+
+    // We've done what we needed and can close the mysql connection!
+    // The user sent a request "/registerPOST" and is expecting a response! You need to tell the response to do something before we finish this express method call.
+    // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
+  });
+  //console.log(result.insertId);
+  //console.dir(result);
+  //console.log(`result ${result}`);
+  console.log("returning home after register post");
+  res.render("home");
 });
