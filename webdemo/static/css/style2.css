@@ -9,7 +9,7 @@ html,body{
 body {
 
  /* font-family: tahoma;*/
-  background-image: url("..//media/beach2.jpg");
+  background-image: url("..//media/beach2.jpg"); /* */
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -37,5 +37,5 @@ body {
     padding-top: 30px;
     padding-bottom: 30px;
     color: inherit;
-    background-color: rgba(211,211,211,.9);
+    background-color: rgba(211,211,211,.85);
 }
