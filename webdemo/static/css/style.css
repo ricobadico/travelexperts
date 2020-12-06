@@ -238,7 +238,6 @@ a{
 
 .introSplash { /*the full-page image revealed by the loader */
   position: fixed;
-  min-width: 100%;
   height:100%;
   width: auto;
 }
