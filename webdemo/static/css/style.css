@@ -52,7 +52,7 @@ a{
     -webkit-transform: translateZ(0); backface-visibility: hidden;
   scale:(1.0, 1.0);
   transform: translateZ(0);
-  background:#1B2030 url("../media/mountains.jpg") 50% 0 no-repeat;
+  background:#1B2030 url("/media/mountains.jpg") 50% 0 no-repeat;
   background-size:100%;
   background-attachment:fixed;
   animation: grow 290s linear 10ms alternate infinite; /* fixKenBurns bob*/
@@ -303,4 +303,8 @@ a{
 
   /*animation: 5.5-6.8 */
   transition: opacity 0.3s 5.5s ease-out, transform 0.3s 6.5s ease-out;
+}
+
+.introwrap{
+  opacity: 0;
 }

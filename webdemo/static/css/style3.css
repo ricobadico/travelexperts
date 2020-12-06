@@ -1,3 +1,31 @@
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans:400,400i,600,600i');
+
+html,body{
+  margin:0;
+  height:120%;
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+.jumbotron{
+    margin-top:15px;
+    max-width: 100%;
+    padding-top: 53px;
+    padding-bottom: 53px;
+    color: inherit;
+    background-color: #D3D3D3;
+}
+
+body {
+
+    background-image: url("/media/Muse1.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    /* bob there was a trailing `/*` here and display and align-items:... */
+    /*  not beign applied, if applied they breadk the page */
+    /*background-position: center;*/ /*originally commented*/ 
+    /*display: flex;*/ /* not applied originally*/
+    /*align-items: center;*/ /* not applied originally*/
+}
 
 /*styles agent placeholder*/
 .our-team {
@@ -133,6 +161,5 @@
 }
 
 .row {
-  display: grid;
   justify-content: center;
 }

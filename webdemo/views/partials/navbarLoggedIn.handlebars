@@ -1,0 +1,33 @@
+
+<!-- [Susan] Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+  <a class="navbar-brand active" href="/?skipIntro=true">Travel Experts<span class="sr-only">(current)</span></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+	<span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNav">
+	<ul class="navbar-nav">
+
+	  <li class="nav-item">
+		<a class="nav-link" href="contact">Contact Us</a>
+	  </li>
+
+	  <li class="nav-item">
+		<a class="nav-link" href="register">Register</a></a>
+	  </li>
+
+	  <li class="nav-item">
+		<a class="nav-link" href="packages">Travel Packages</a>
+	  </li>
+
+	</ul>
+  </div>
+
+  <form name=logout-form class="form-inline" action="/logout" method="POST">
+    <input class="form-control mr-sm-2" value="theUserId" name=username required type="text" placeholder="Username" aria-label="Username">
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
+  </form>
+</nav>

@@ -1,8 +1,18 @@
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans:400,400i,600,600i');
+
+html,body{
+  margin:0;
+  height:120%;
+  font-family: 'Josefin Sans', sans-serif;
+}
+
 body {
-  font-family: tacoma;
+
+ /* font-family: tahoma;*/
   background-image: url("..//media/leaves3.jpg");
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
 }
 
 
@@ -14,4 +24,18 @@ body {
   text-align: center;
   overflow: hidden;
   position: relative;
+}
+
+.bg-input {
+    background-color:#B9EEFB;
+}
+
+
+.jumbotron{
+    margin-top:15px;
+    max-width: 100%;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    color: inherit;
+    background-color: #D3D3D3;
 }

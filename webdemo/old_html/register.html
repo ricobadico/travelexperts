@@ -4,10 +4,8 @@
 
 	<title>Register Page</title>
 	<!--link rel="stylesheet" href="css/reset.css" --> <!-- reset removed by bob-->
-	<link rel="stylesheet" href="css/style2.css">
-	<script src="js/script2.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-	<style>
+	<!--style>
 		input[name]{
 			background-color:#B9EEFB;
 		}
@@ -20,13 +18,13 @@
   		color: inherit;
  		background-color: #D3D3D3;
 		}
-	</style>	
+	</style-->	
 
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="js/script.js"></script>	
+	<link rel="stylesheet" href="css/style2.css">
 </head>
 <body>
 
@@ -71,12 +69,12 @@
 				<div class="form-row ">
 	    			<div class="col-sm-6 ">
 						<label for="firstName">First Name:</label><br/>
-						<input class="form-control" type="text" name="firstName" id="firstName" required="required" placeholder="First Name">
+						<input class="form-control bg-input" type="text" name="firstName" id="firstName" required="required" placeholder="First Name">
 						<div class="invalid-feedback">Please enter your first name</div><br/>
 					</div>	
 					<div class="col-sm-6 ">
 						<label for="lastName">Last Name:</label><br/>
-						<input class="form-control" type="text" name="lastName" id="lastName" required="required" placeholder="Last Name">
+						<input class="form-control bg-input" type="text" name="lastName" id="lastName" required="required" placeholder="Last Name">
 						<div class="invalid-feedback">Please enter your last name</div>
 					</div>
 				</div>
@@ -87,14 +85,14 @@
 						<div class="input-group-prepend">
 	          				<span class="input-group-text" id="inputGroupPrepend">@</span>
 	        			</div>
-						<input class="form-control" type="text" name="userName" id="userName" required="required" placeholder="Username">
+						<input class="form-control bg-input" type="text" name="userName" id="userName" required="required" placeholder="Username">
 						<div class="invalid-feedback">Please enter a username</div>
 						<br/>
 						</div>	
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="pwd">Password:</label><br/>
-						<input class="form-control" type="password" name="pwd" id="pwd" required="required" placeholder="Password">
+						<input class="form-control bg-input" type="password" name="pwd" id="pwd" required="required" placeholder="Password">
 						<div class="invalid-feedback">Please enter a password</div>
 					</div>	
 				</div>	
@@ -102,13 +100,13 @@
 				<div class="form-row">	
 	    			<div class="col-sm-6">
 						<label for="email">Email:</label><br/>
-						<input class="form-control" type="text" name="email" id="email" required="required" placeholder="Email" onchange="checkEmail(this)">
+						<input class="form-control bg-input" type="text" name="email" id="email" required="required" placeholder="Email" onchange="checkEmail(this)">
 						<div class="invalid-feedback">Please enter your email</div>
 						<br/>
 					</div>	
 					<div class="col-sm-6">
 						<label for="email">Phone Number:</label><br/>
-						<input class="form-control" type="text" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)">
+						<input class="form-control bg-input" type="text" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)">
 						<div class="invalid-feedback">Please enter your phone number</div>
 						<br/>
 					</div>
@@ -116,17 +114,17 @@
 				<div class="form-row ">
 	    			<div class="col-sm-6 mb-3">
 						<label for="address">Address:</label>
-						<input class="form-control" type="text" name="address" id="address" required="required" placeholder="Address">
+						<input class="form-control bg-input" type="text" name="address" id="address" required="required" placeholder="Address">
 						<div class="invalid-feedback">Please enter your address</div><br/>	
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="city">City:</label><br/>
-						<input class="form-control" type="text" name="city" id="city" required="required" placeholder="City">
+						<input class="form-control bg-input" type="text" name="city" id="city" required="required" placeholder="City">
 						<div class="invalid-feedback">Please enter your city</div>
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="prov">Province</label>
-					    <select class="form-control" name="prov" id="prov" required="required">
+					    <select class="form-control bg-input" name="prov" id="prov" required="required">
 					      <option>AB</option>
 					      <option>BC</option>
 					      <option>MB</option>
@@ -144,7 +142,7 @@
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="pCode">Postal Code:</label><br/>
-						<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
+						<input class="form-control bg-input" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
 						<div class="invalid-feedback">Please enter your postal code</div>
 					</div>		
 				</div>	
@@ -201,7 +199,7 @@
 				</div>	<br/><br/>
 				
 		    	<label for="comments">Additional Comments:</label>
-		    	<textarea class="form-control" id="addCom" rows="3"></textarea><br/><br/>
+		    	<textarea class="form-control bg-input" id="addCom" rows="3"></textarea><br/><br/>
 		    </div>
 		  		
 				<input class="btn btn-info" type="submit" value="Send Registration" onclick="return confirm('Please confirm all information is accurate upon submission')"/>
@@ -209,5 +207,7 @@
 		</form>
 </div>		
 </div>
+<script src="js/script.js"></script>	
+<link rel="stylesheet" href="css/style2.css">
 </body>
 </html>
