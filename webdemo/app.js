@@ -32,7 +32,7 @@ app.engine("handlebars", handlebars({ extname: "handlebars" }));
 // session to identify unique client session and login auth
 app.use( 
   session({
-    genid : (req) => {
+    id : (req) => {
         return uuid.uuidv4();
     },
     secret: process.env.SECRET,
@@ -48,15 +48,21 @@ app.use("/", express.static(path.join(__dirname, "static")));
 
 // prettier-ignore
 const getConnection = () => {
-    // Open up the database for use. Any express method call can use this 'connection' variable, but needs to connect and end it's particular connection instance! (see existing examples)
-    let connection = mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_NAME,
-      multipleStatements: true
-    });
-    return connection;
+    // Open up the database for use. Any expreess method call can use this 'connection' variable, but needs to connect and end it's particular connection instance! (see existing examples)
+    try {
+        let connection = mysql.createConnection({
+          host: process.env.DB_HOST,
+          user: process.env.DB_USER,
+          password: process.env.DB_PASS,
+          database: process.env.DB_NAME,
+          multipleStatements: true
+        });
+        console.log(`DB connection success: ${process.env.DB_HOST}`);
+        return connection;
+    } catch (err) {
+        console.error(err);
+        process.exit(1);
+    }
 }
 
 // Start the express server listen for requests and send responses
