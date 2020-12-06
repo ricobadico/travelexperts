@@ -46,8 +46,15 @@ app.listen(PORT, () => {
 
 // Define our routes and render templates
 app.get("/register", (req, res) => {
+
+  // This data gets passed into the template (in this case, for the header)
+  const registerInputs = {
+    Title: "Register",
+    Subtitle: "Register for an account to stay up to date on our hottest deals."
+  }
+
   console.log("render register");
-  res.render("register");
+  res.render("register", registerInputs);
 });
 
 app.get("/packages", (req, res) => {
@@ -69,7 +76,7 @@ app.get("/contact", (req, res) => {
   connection.connect();
 
   //Start building the array that will contain the data we need, in a form useful to handlebars
-  let dynamicAgencyList = { Agencies: [] };
+  let contactInputs = { Agencies: [] };
 
   // Query 1 : get the data. results[0] is the array of agencies, results[1] the array of agents
   connection.query("SELECT * FROM agencies; SELECT * from agents", function (
@@ -85,10 +92,10 @@ app.get("/contact", (req, res) => {
     // For each agency pulled up in that query, we've got some work to do
     for (let i in agencies) {
       // Add that agency as an entry to the agency array
-      dynamicAgencyList.Agencies.push(agencies[i]);
+      contactInputs.Agencies.push(agencies[i]);
 
       // Add an empty array element for agents (to be filled below)
-      dynamicAgencyList.Agencies[i].agents = [];
+      contactInputs.Agencies[i].agents = [];
     }
 
     // Now we iterate through agents and assign them to their proper agencies
@@ -96,13 +103,16 @@ app.get("/contact", (req, res) => {
       homeAgency = agents[j].AgencyId;
 
       // here, we are adding the current agent to the agency at the index corresponding to their id (which is -1)
-      dynamicAgencyList.Agencies[homeAgency - 1].agents.push(agents[j]);
+      contactInputs.Agencies[homeAgency - 1].agents.push(agents[j]);
     }
-    //console.log(agents);
+    // With the heavy lifting done, we can add any other needed data for the template, in this case the header information
+    contactInputs.Title = "Contact Us";
+    contactInputs.Subtitle = "Contact one of our international travel agents for inquiries on your next travel destination."
+   
     console.log("render contacts");
     // We now have all the data needed to populate the template, in the form the template is expecting
     // prettier-ignore
-    res.render("contacts2", dynamicAgencyList);
+    res.render("contacts2", contactInputs);
     connection.end();
   });
 });
