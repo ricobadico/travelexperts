@@ -4,14 +4,10 @@ const handlebars = require("express-handlebars");
 const mysql = require("mysql");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
-<<<<<<< HEAD
-// Random function helper used to get random splashpage image
-const { randomNum } = require("./static/js/randomNum.js")
-=======
+const { randomNum } = require("./static/js/randomNum.js");
 const redis = require("redis");
 const session = require("express-session");
 const uuid = require("uuid");
->>>>>>> templateTestBob
 
 let RedisStore = require("connect-redis")(session);
 let redisClient = redis.createClient();
@@ -85,8 +81,13 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/packages", (req, res) => {
+
+  packagesInput = {
+    Title: "Our Packages",
+    Subtitle: "Find the perfect upcoming trip for you."
+  }
   console.log("render packages");
-  res.render("packages");
+  res.render("packages", packagesInput);
 });
 
 app.get("/", (req, res) => {

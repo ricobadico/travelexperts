@@ -1,9 +1,11 @@
 
 .jumbotron{
-    margin-top:15px;
+    display: flex;
+    margin:15px auto 0;
     max-width: 100%;
     padding-top: 30px;
     padding-bottom: 30px;
     color: inherit;
     background-color: rgba(211,211,211,.85);
+    justify-content: center;
 }
