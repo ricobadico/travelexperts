@@ -6,22 +6,51 @@ const morgan = require("morgan");
 const dotenv = require("dotenv");
 const session = require("express-session");
 const uuid = require("uuid");
-
-//Load Config
-dotenv.config({ path: "./.env", debug: false });
+const cookieParser = require("cookie-parser");
 
 const app = express();
-app.use(express.urlencoded({ extended: true }));
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
+// In memory cache / data store
+const MemcachedStore = require("connect-memcached")(session);
 
+//Load Config Environment variables
+dotenv.config({ path: "./.env", debug: false });
 const PORT = process.env.PORT || 8000;
 
-// Open up the database for use. Any express method call can use this 'connection' variable, but needs to connect and end it's particular connection instance! (see existing examples)
+// Setup Express Middleware ---------------------------------//
+
+app.use(express.urlencoded({ extended: true })); // parse url
+if (process.env.NODE_ENV === "development") {
+  // log req res in dev
+  app.use(morgan("dev"));
+}
+app.use(cookieParser());
+//  Set handlebars as view engine
+app.set("view engine", "handlebars");
+app.engine("handlebars", handlebars({ extname: "handlebars" }));
+// prettier-ignore
+// session to identify unique client session and login auth
+app.use( 
+  session({
+    id : (req) => {
+        return uuid.uuidv4();
+    },
+    secret: "OOSD is great",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {},
+    store: new MemcachedStore({
+      hosts: [process.env.MEM_HOST],
+      secret: process.env.MEM_SECRET
+    })
+  })
+);
+app.use("/", express.static(path.join(__dirname, "static")));
+
+//  HELPERS ---------------------------------//
+
 // prettier-ignore
 const getConnection = () => {
-
+    // Open up the database for use. Any express method call can use this 'connection' variable, but needs to connect and end it's particular connection instance! (see existing examples)
     let connection = mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
@@ -32,35 +61,14 @@ const getConnection = () => {
     return connection;
 }
 
-//  Set handlebars as view engine
-app.set("view engine", "handlebars");
-// Handlebars needs this engine line to configure it and work properly
-// prettier-ignore
-app.engine("handlebars", handlebars({extname: "handlebars"}));
-//prettier-ignore
-app.use(
-  session({
-    id : (req) => {
-        return uuid.uuidv4();
-    },
-    secret: "OOSD is great",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {}
-  })
-);
-
-// Set up serving of static files
-//app.use("/static", express.static(path.join(__dirname, "public")));
-app.use("/", express.static(path.join(__dirname, "static")));
-
+// Start the express server listen for requests and send responses
 app.listen(PORT, () => {
   console.log(
     `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`
   );
 });
 
-// Define our routes and render templates
+// ROUTES ---------------------------------//
 app.get("/register", (req, res) => {
   console.log("render register");
   res.render("register");
