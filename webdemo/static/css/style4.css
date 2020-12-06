@@ -2,11 +2,12 @@
 .jumbotron{
 	margin-top:15px;
 	max-width: 100%;
-	  padding-top: 30px;
-	  padding-bottom: 30px;
-	  color: inherit;
-	  background-color: #D3D3D3;
-	}
+  padding-top: 30px;
+  padding-bottom: 30px;
+  color: inherit;
+  /* background-color: #D3D3D3; */
+}
+
 
 body {
   font-family: tahoma;

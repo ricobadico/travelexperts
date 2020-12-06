@@ -23,7 +23,7 @@ function checkPcode(){
 // checks phone number validity
 function checkNumber(){
 	var text = document.getElementById("pNumber"); 
-	var exp = /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}\s.?[\s.-]?\d{4}$/;
+	var exp = /^(1[ \-\+]{0,3}|\+1[ -\+]{0,3}|\+1|\+)?((\(\+?1-[2-9][0-9]{1,2}\))|(\(\+?[2-8][0-9][0-9]\))|(\(\+?[1-9][0-9]\))|(\(\+?[17]\))|(\([2-9][2-9]\))|([ \-\.]{0,3}[0-9]{2,4}))?([ \-\.][0-9])?([ \-\.]{0,3}[0-9]{2,4}){2,3}$/;
 	if(exp.test(text.value));
 	else
 	{
@@ -32,7 +32,7 @@ function checkNumber(){
 	}
 }
 
-// disable form submissions if there are invalid fields
+//disable form submissions if there are invalid fields
 (function() {
   'use strict';
   window.addEventListener('load', function() {
@@ -45,8 +45,9 @@ function checkNumber(){
           event.preventDefault();
           event.stopPropagation();
         }
-        form.classList.add('was-validated');
+		form.classList.add('was-validated');
       }, false);
     });
   }, false);
 })();
+

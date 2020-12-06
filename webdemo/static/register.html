@@ -7,207 +7,187 @@
 	<link rel="stylesheet" href="css/style2.css">
 	<script src="js/script2.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-	<style>
-		input[name]{
-			background-color:#B9EEFB;
-		}
-
-		.jumbotron{
-		margin-top:15px;
-		max-width: 100%;
-  		padding-top: 30px;
-  		padding-bottom: 30px;
-  		color: inherit;
- 		background-color: #D3D3D3;
-		}
-	</style>	
-
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="js/script.js"></script>	
+	
+	
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+
+
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">	
 </head>
 <body>
-
 	<div class="jumbotron text-center"  style="margin-bottom:0">
 		<div class="container">
   			<h1>Register</h1>
   			<p>Register for an account to stay up to date on our hottest deals</p>
   		</div>
 	</div>
-
-
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-
-  <a class="navbar-brand" href="index.html">Travel Experts</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" href="contact.html">Contact Us</a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="register.html">Register <span class="sr-only">(current)</span></a></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Ongoing Deals</a>
-      </li>
-    </ul>
-  </div>
-
-</nav>
-
-<br/><br/>
-
-
-<div class="container">
-<div class="registrationForm">	
-		<form method="POST" action="bouncer.php" class="needs-validation" novalidate>
-			<h4 class="text-center">Registration Form</h4>
-				<div class="form-row ">
-	    			<div class="col-sm-6 ">
-						<label for="firstName">First Name:</label><br/>
-						<input class="form-control" type="text" name="firstName" id="firstName" required="required" placeholder="First Name">
-						<div class="invalid-feedback">Please enter your first name</div><br/>
-					</div>	
-					<div class="col-sm-6 ">
-						<label for="lastName">Last Name:</label><br/>
-						<input class="form-control" type="text" name="lastName" id="lastName" required="required" placeholder="Last Name">
-						<div class="invalid-feedback">Please enter your last name</div>
-					</div>
-				</div>
-				<div class="form-row ">
-	    			<div class="col-sm-6 mb-3">
-						<label for="userName">Username:</label>
-						<div class="input-group">
-						<div class="input-group-prepend">
-	          				<span class="input-group-text" id="inputGroupPrepend">@</span>
-	        			</div>
-						<input class="form-control" type="text" name="userName" id="userName" required="required" placeholder="Username">
-						<div class="invalid-feedback">Please enter a username</div>
-						<br/>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="index.html">Travel Experts</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav">
+			<li class="nav-item">
+				<a class="nav-link" href="contact.html">Contact Us</a>
+			</li>
+			<li class="nav-item active">
+				<a class="nav-link" href="register.html">Register <span class="sr-only">(current)</span></a></a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="#">Ongoing Deals</a>
+			</li>
+			</ul>
+		</div>
+	</nav>
+	<br/>
+	<br/>
+	<div class="container">
+		<div class="registrationForm">	
+			<form method="POST" action="bouncer.php" class="needs-validation" novalidate >
+				<h4 class="text-center">Registration Form</h4>
+					<div class="form-row ">
+						<div class="col-sm-6 ">
+							<label for="firstName">First Name:</label><br/>
+							<input class="form-control" type="text" name="firstName" id="firstName" required="required" placeholder="First Name">
+							<div class="invalid-feedback">Please enter your first name</div><br/>
 						</div>	
+						<div class="col-sm-6 ">
+							<label for="lastName">Last Name:</label><br/>
+							<input class="form-control" type="text" name="lastName" id="lastName" required="required" placeholder="Last Name">
+							<div class="invalid-feedback">Please enter your last name</div>
+						</div>
 					</div>
-					<div class="col-sm-6 mb-3">
-						<label for="pwd">Password:</label><br/>
-						<input class="form-control" type="password" name="pwd" id="pwd" required="required" placeholder="Password">
-						<div class="invalid-feedback">Please enter a password</div>
+					<div class="form-row ">
+						<div class="col-sm-6 mb-3">
+							<label for="userName">Username:</label>
+							<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text" id="inputGroupPrepend">@</span>
+							</div>
+							<input class="form-control" type="text" name="userName" id="userName" required="required" placeholder="Username">
+							<div class="invalid-feedback">Please enter a username</div>
+							<br/>
+							</div>	
+						</div>
+						<div class="col-sm-6 mb-3">
+							<label for="pwd">Password:</label><br/>
+							<input class="form-control" type="password" name="pwd" id="pwd" required="required" placeholder="Password">
+							<div class="invalid-feedback">Please enter a password</div>
+						</div>	
 					</div>	
-				</div>	
 
-				<div class="form-row">	
-	    			<div class="col-sm-6">
-						<label for="email">Email:</label><br/>
-						<input class="form-control" type="text" name="email" id="email" required="required" placeholder="Email" onchange="checkEmail(this)">
-						<div class="invalid-feedback">Please enter your email</div>
-						<br/>
+					<div class="form-row">	
+						<div class="col-sm-6">
+							<label for="email">Email:</label><br/>
+							<input class="form-control" type="text" name="email" id="email" required="required" placeholder="Email" onchange="checkEmail(this)">
+							<div class="invalid-feedback">Please enter your email</div>
+							<br/>
+						</div>	
+						<div class="col-sm-6">
+							<label for="pNumber">Phone Number:</label><br/>
+							<input class="form-control" type="text" name="pNumber" id="pNumber" required="required" placeholder="Phone Number"  onchange="checkNumber(this)">
+							<div class="invalid-feedback">Please enter your phone number</div>
+							<br/>
+						</div>
 					</div>	
-					<div class="col-sm-6">
-						<label for="email">Phone Number:</label><br/>
-						<input class="form-control" type="text" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)">
-						<div class="invalid-feedback">Please enter your phone number</div>
-						<br/>
+					<div class="form-row ">
+						<div class="col-sm-6 mb-3">
+							<label for="address">Address:</label>
+							<input class="form-control" type="text" name="address" id="address" required="required" placeholder="Address">
+							<div class="invalid-feedback">Please enter your address</div><br/>	
+						</div>
+						<div class="col-sm-6 mb-3">
+							<label for="city">City:</label><br/>
+							<input class="form-control" type="text" name="city" id="city" required="required" placeholder="City">
+							<div class="invalid-feedback">Please enter your city</div>
+						</div>
+						<div class="col-sm-6 mb-3">
+							<label for="prov">Province</label>
+							<select class="form-control" name="prov" id="prov" required="required">
+							<option>AB</option>
+							<option>BC</option>
+							<option>MB</option>
+							<option>NB</option>
+							<option>NL</option>
+							<option>NS</option>
+							<option>NT</option>
+							<option>NU</option>
+							<option>ON</option>
+							<option>PE</option>
+							<option>QC</option>
+							<option>SK</option>
+							<option>YT</option>
+							</select>
+						</div>
+						<div class="col-sm-6 mb-3">
+							<label for="pCode">Postal Code:</label><br/>
+							<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
+							<div class="invalid-feedback">Please enter your postal code</div>
+						</div>		
+					</div>	
+					<!--Trip Information to be used on another page-->
+					<!--<div class="text-left">
+					<label for="triptype">Trip Type:</label>
 					</div>
-				</div>	
-				<div class="form-row ">
-	    			<div class="col-sm-6 mb-3">
-						<label for="address">Address:</label>
-						<input class="form-control" type="text" name="address" id="address" required="required" placeholder="Address">
-						<div class="invalid-feedback">Please enter your address</div><br/>	
+					<div class="custom-control custom-radio text-left">
+						<input type="radio" name="triptype" value="roundTrip" selected="selected"/>
+						<label for="roundTrip">Round Trip</label>
 					</div>
-					<div class="col-sm-6 mb-3">
-						<label for="city">City:</label><br/>
-						<input class="form-control" type="text" name="city" id="city" required="required" placeholder="City">
-						<div class="invalid-feedback">Please enter your city</div>
+					<div class="custom-control custom-radio text-left">
+						<input type="radio" name="triptype" value="oneWay" />
+						<label for="oneWay">One Way</label>
 					</div>
-					<div class="col-sm-6 mb-3">
-						<label for="prov">Province</label>
-					    <select class="form-control" name="prov" id="prov" required="required">
-					      <option>AB</option>
-					      <option>BC</option>
-					      <option>MB</option>
-					      <option>NB</option>
-					      <option>NL</option>
-					      <option>NS</option>
-					      <option>NT</option>
-					      <option>NU</option>
-					      <option>ON</option>
-					      <option>PE</option>
-					      <option>QC</option>
-					      <option>SK</option>
-					      <option>YT</option>
-					    </select>
+					<div class="custom-control custom-radio text-left">
+						<input type="radio" name="triptype" value="multiCity" />
+						<label for="multiCity">Multi City</label>
 					</div>
-					<div class="col-sm-6 mb-3">
-						<label for="pCode">Postal Code:</label><br/>
-						<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
-						<div class="invalid-feedback">Please enter your postal code</div>
-					</div>		
-				</div>	
+					<div class="form-group row">
+						<label for="adults" class="col-3 col-form-label">Number of Adults (18+)</label>
+					<div class="col-9">
+						<input class="form-control" type="number" id="adults">
+					</div>
+					</div>
 
-				<!--Trip Information to be used on another page-->
-				<!--<div class="text-left">
-				<label for="triptype">Trip Type:</label>
-				</div>
-				<div class="custom-control custom-radio text-left">
-					<input type="radio" name="triptype" value="roundTrip" selected="selected"/>
-					<label for="roundTrip">Round Trip</label>
-				</div>
-				<div class="custom-control custom-radio text-left">
-					<input type="radio" name="triptype" value="oneWay" />
-					<label for="oneWay">One Way</label>
-				</div>
-				<div class="custom-control custom-radio text-left">
-					<input type="radio" name="triptype" value="multiCity" />
-					<label for="multiCity">Multi City</label>
-				</div>
+					<div class="form-group row">
+						<label for="children" class="col-3 col-form-label">Number of Children (0-17)</label>
+					<div class="col-9">
+						<input class="form-control" type="number" id="children">
+					</div>
+					</div>
 
-
-				<div class="form-group row">
-		  			<label for="adults" class="col-3 col-form-label">Number of Adults (18+)</label>
-		  		<div class="col-9">
-		    		<input class="form-control" type="number" id="adults">
-		 		</div>
+					<div class="form-group row">
+					<label for="departure" class="col-2 col-form-label">Departure Date</label>
+					<div class="col-10">
+						<input class="form-control" type="date" id="departure">
+					</div>
+					</div>
+					<div class="form-group row ">
+					<label for="return" class="col-2 col-form-label">Return Date</label>
+					<div class="col-10">
+						<input class="form-control" type="date" id="return">
+					</div>
+					</div>-->
+					<div class="text-left">
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" type="checkbox" name="sendInfo" value="sendSpam" checked="checked">
+						<label class="form-check-label" for="Spam">Send me advertising</label>
+					</div>	
+					<br/>
+					<br/>
+					<label for="comments">Additional Comments:</label>
+					<textarea class="form-control" id="addCom" rows="3"></textarea><br/><br/>
 				</div>
-
-				<div class="form-group row">
-		  			<label for="children" class="col-3 col-form-label">Number of Children (0-17)</label>
-		  		<div class="col-9">
-		    		<input class="form-control" type="number" id="children">
-		 		</div>
-				</div>
-
-				<div class="form-group row">
-				  <label for="departure" class="col-2 col-form-label">Departure Date</label>
-				  <div class="col-10">
-				    <input class="form-control" type="date" id="departure">
-				  </div>
-				</div>
-				<div class="form-group row ">
-				  <label for="return" class="col-2 col-form-label">Return Date</label>
-				  <div class="col-10">
-				    <input class="form-control" type="date" id="return">
-				  </div>
-				</div>-->
-
-				<div class="text-left">
-				<div class="form-check form-check-inline">
-		  			<input class="form-check-input" type="checkbox" name="sendInfo" value="sendSpam" checked="checked">
-		  			<label class="form-check-label" for="Spam">Send me advertising</label>
-				</div>	<br/><br/>
-				
-		    	<label for="comments">Additional Comments:</label>
-		    	<textarea class="form-control" id="addCom" rows="3"></textarea><br/><br/>
-		    </div>
-		  		
-				<input class="btn btn-info" type="submit" value="Send Registration" onclick="return confirm('Please confirm all information is accurate upon submission')"/>
-				<input class="btn btn-info" type="reset" value="Reset Form" onclick="return confirm('Do you really want to reset?')"/>
-		</form>
-</div>		
-</div>
+					<input class="btn btn-info" type="submit" value="Send Registration" onclick="return confirm('Please confirm all information is accurate upon submission')" />
+					<input class="btn btn-info" type="reset" value="Reset Form" onclick="return confirm('Do you really want to reset?')"/>
+			</form>
+		</div>		
+	</div>
 </body>
 </html>
