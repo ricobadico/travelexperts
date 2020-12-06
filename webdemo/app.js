@@ -155,7 +155,7 @@ app.get("/contact", (req, res) => {
       // For each agency pulled up in that query, we've got some work to do
       for (let i in agencies) {
         // Add that agency as an entry to the agency array
-        dynamicAgencyList.Agencies.push(agencies[i]);
+        contactInputs.Agencies.push(agencies[i]);
 
       // here, we are adding the current agent to the agency at the index corresponding to their id (which is -1)
       contactInputs.Agencies[homeAgency - 1].agents.push(agents[j]);
