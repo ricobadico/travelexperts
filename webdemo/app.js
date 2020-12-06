@@ -4,13 +4,15 @@ const handlebars = require("express-handlebars");
 const mysql = require("mysql");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
+const redis = require("redis");
 const session = require("express-session");
 const uuid = require("uuid");
-const cookieParser = require("cookie-parser");
+
+let RedisStore = require("connect-redis")(session);
+let redisClient = redis.createClient();
 
 const app = express();
 // In memory cache / data store
-const MemcachedStore = require("connect-memcached")(session);
 
 //Load Config Environment variables
 dotenv.config({ path: "./.env", debug: false });
@@ -23,7 +25,7 @@ if (process.env.NODE_ENV === "development") {
   // log req res in dev
   app.use(morgan("dev"));
 }
-app.use(cookieParser());
+//app.use(cookieParser());
 //  Set handlebars as view engine
 app.set("view engine", "handlebars");
 app.engine("handlebars", handlebars({ extname: "handlebars" }));
@@ -34,14 +36,11 @@ app.use(
     id : (req) => {
         return uuid.uuidv4();
     },
-    secret: "OOSD is great",
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {},
-    store: new MemcachedStore({
-      hosts: [process.env.MEM_HOST],
-      secret: process.env.MEM_SECRET
-    })
+    store: new RedisStore({ client: redisClient})
   })
 );
 app.use("/", express.static(path.join(__dirname, "static")));
