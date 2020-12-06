@@ -1,15 +1,16 @@
 const express = require("express");
 const path = require("path");
 const handlebars = require("express-handlebars");
-const mysql = require("mysql");
+const getConnection = require("./models/db.js");
+const auth = require("./modules/auth.js");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const redis = require("redis");
 const session = require("express-session");
 const uuid = require("uuid");
 
-let RedisStore = require("connect-redis")(session);
-let redisClient = redis.createClient();
+const RedisStore = require("connect-redis")(session);
+const redisClient = redis.createClient();
 
 const app = express();
 // In memory cache / data store
@@ -33,7 +34,7 @@ app.engine("handlebars", handlebars({ extname: "handlebars" }));
 app.use( 
   session({
     id : (req) => {
-        return uuid.uuidv4();
+        return uuid.v4();
     },
     secret: process.env.SECRET,
     resave: false,
@@ -46,31 +47,19 @@ app.use("/", express.static(path.join(__dirname, "static")));
 
 //  HELPERS ---------------------------------//
 
-// prettier-ignore
-const getConnection = () => {
-    // Open up the database for use. Any expreess method call can use this 'connection' variable, but needs to connect and end it's particular connection instance! (see existing examples)
-    try {
-        let connection = mysql.createConnection({
-          host: process.env.DB_HOST,
-          user: process.env.DB_USER,
-          password: process.env.DB_PASS,
-          database: process.env.DB_NAME,
-          multipleStatements: true
-        });
-        console.log(`DB connection success: ${process.env.DB_HOST}`);
-        return connection;
-    } catch (err) {
-        console.error(err);
-        process.exit(1);
-    }
-}
-
 // Start the express server listen for requests and send responses
 app.listen(PORT, () => {
   console.log(
     `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`
   );
 });
+
+//test
+auth.genPasswordHash("password");
+auth.checkPasswordHash(
+  "password",
+  `$2b$10$xpW2q/66FpNC6TjGDp3onehApNj5iiNwC/9s9vHsaWmKcxi470TpO`
+);
 
 // ROUTES ---------------------------------//
 app.get("/register", (req, res) => {
@@ -91,7 +80,7 @@ app.get("/", (req, res) => {
 });
 
 // for testing the login
-app.get("/login", (req, res, next) => {
+app.get("/sessionTest", (req, res, next) => {
   if (req.session.views) {
     req.session.views++;
     res.setHeader("Content-Type", "text/html");
@@ -105,6 +94,28 @@ app.get("/login", (req, res, next) => {
     res.end("welcome to the session demo. refresh!");
   }
 });
+
+app.post("/login", (req, res, next) => {
+  console.log(req.body);
+  console.log(req.session);
+  // true/false to replace with validate funciton
+  if (false) {
+    req.session.userid = "45";
+    console.log(req.session);
+    res.send("<h1>Post Recieved<h1>");
+  } else {
+    res.redirect(400, "/error");
+  }
+});
+
+app.get("/error", (req, res) => {
+  res.render("error", { httpcode: res.status, message: "Error Message" });
+});
+
+app.post("/error", (req, res) => {
+  res.render("error", { httpcode: res.status, message: "Error Message" });
+});
+
 // Feisty template render for Contact page, requires nested queries fed into a complicated template
 // It works but occasionally fails to pull from the db, I'll work on it
 app.get("/contact", (req, res) => {

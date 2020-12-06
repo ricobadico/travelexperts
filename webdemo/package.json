@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "connect-memcached": "^1.0.0",
     "connect-redis": "^5.0.0",
     "cookie-parser": "^1.4.5",
