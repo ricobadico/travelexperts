@@ -33,7 +33,7 @@ app.engine("handlebars", handlebars({ extname: "handlebars" }));
 app.use( 
   session({
     genid : (req) => {
-        return uuid.uuidv4();
+        return uuid.v4();
     },
     secret: process.env.SECRET,
     resave: false,
