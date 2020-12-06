@@ -77,7 +77,7 @@ app.get("/packages", (req, res) => {
 
 app.get("/", (req, res) => {
   //res.writeHead(200, { "Content-Type": "text/html" });
-  console.log(req.query);
+  //console.log(req.query);
   console.log("render home");
   res.render("home", { skipIntro: req.query.skipIntro });
 });
@@ -129,39 +129,39 @@ app.get("/contact", (req, res) => {
   let dynamicAgencyList = { Agencies: [] };
 
   // Query 1 : get the data. results[0] is the array of agencies, results[1] the array of agents
-  connection.query("SELECT * FROM agencies; SELECT * from agents", function (
-    error,
-    results
-  ) {
-    if (error) {
-      console.log(error);
-    } //throw new Error("Failed to load agency table from database");
-    const agencies = results[0];
-    const agents = results[1];
+  connection.query(
+    "SELECT * FROM agencies; SELECT * from agents",
+    (err, results) => {
+      if (err) {
+        console.error(err);
+      } //throw new Error("Failed to load agency table from database");
+      const agencies = results[0];
+      const agents = results[1];
 
-    // For each agency pulled up in that query, we've got some work to do
-    for (let i in agencies) {
-      // Add that agency as an entry to the agency array
-      dynamicAgencyList.Agencies.push(agencies[i]);
+      // For each agency pulled up in that query, we've got some work to do
+      for (let i in agencies) {
+        // Add that agency as an entry to the agency array
+        dynamicAgencyList.Agencies.push(agencies[i]);
 
-      // Add an empty array element for agents (to be filled below)
-      dynamicAgencyList.Agencies[i].agents = [];
+        // Add an empty array element for agents (to be filled below)
+        dynamicAgencyList.Agencies[i].agents = [];
+      }
+
+      // Now we iterate through agents and assign them to their proper agencies
+      for (let j in agents) {
+        homeAgency = agents[j].AgencyId;
+
+        // here, we are adding the current agent to the agency at the index corresponding to their id (which is -1)
+        dynamicAgencyList.Agencies[homeAgency - 1].agents.push(agents[j]);
+      }
+      //console.log(agents);
+      console.log("render contacts");
+      // We now have all the data needed to populate the template, in the form the template is expecting
+      // prettier-ignore
+      res.render("contacts2", dynamicAgencyList);
+      connection.end();
     }
-
-    // Now we iterate through agents and assign them to their proper agencies
-    for (let j in agents) {
-      homeAgency = agents[j].AgencyId;
-
-      // here, we are adding the current agent to the agency at the index corresponding to their id (which is -1)
-      dynamicAgencyList.Agencies[homeAgency - 1].agents.push(agents[j]);
-    }
-    //console.log(agents);
-    console.log("render contacts");
-    // We now have all the data needed to populate the template, in the form the template is expecting
-    // prettier-ignore
-    res.render("contacts2", dynamicAgencyList);
-    connection.end();
-  });
+  );
 });
 
 // Insert the Register data into the database. All the Register page form needs to do is have "registerPOST" as its action to fire this off
@@ -181,7 +181,7 @@ app.post("/registerPOST", (req, res) => {
     pCode,
     sendInfo
   } = req.body;
-  console.log(req.body);
+  //console.log(req.body);
   // Use the defined connection config to connect
   let connection = getConnection();
   connection.connect();
@@ -211,17 +211,15 @@ app.post("/registerPOST", (req, res) => {
   // Use a mysql connection's built-in query function to query the database. First argument is the SQL query, second argument defines placeholders ('?') in that query.
   // Third argument is the callback that happens once you've successfully gotten back the data (or an error) from the database
   let recordId;
-  connection.query(sql, (error, result) => {
-    console.log("hi");
-    if (error) {
+  connection.query(sql, (err, result) => {
+    if (err) {
       connection.end();
-      console.log(error);
+      console.error(err);
       throw Error;
     }
-    console.log("hello");
     // We're going to leave a console.log here just so anyone on the server can confirm that something happened
     recordId = result.insertId;
-    console.log(result.insertId);
+    //console.log(result.insertId);
 
     connection.end();
     // if the customer was inserted we take that record and
@@ -231,9 +229,8 @@ app.post("/registerPOST", (req, res) => {
       if (err) {
         console.error(err);
         console.log("unable to hash new password!");
-        return false; // continue
       } else {
-        console.log(hash);
+        //console.log(hash);
         // Open a new connection and attempt the query
         let connection2 = getConnection();
         connection2.connect();
@@ -241,15 +238,17 @@ app.post("/registerPOST", (req, res) => {
           "INSERT INTO `web_credentials` (`CustomerId`, `Username`, `Hash`) VALUES (?,?,?)";
         inserts = [recordId, userName, hash];
         sql = mysql.format(sql, inserts);
-        console.log(sql);
         connection2.query(sql, (err, result) => {
           if (err) {
             connection2.end();
             console.error(err);
-            throw Error;
           } else {
-            console.log("insert web Cred success");
-            console.log(result.insertId);
+            console.log(`Insert success: ${sql}`);
+            console.log(`Row Id = ${result.insertId}`);
+            req.session.userid = recordId;
+            console.log(`Store req.session.userid = ${req.session.userid}`);
+            req.session.email = email;
+            console.log(`Store req.session.email = ${req.session.email}`);
             connection2.end();
           }
         });
@@ -260,9 +259,7 @@ app.post("/registerPOST", (req, res) => {
     // The user sent a request "/registerPOST" and is expecting a response! You need to tell the response to do something before we finish this express method call.
     // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
   });
-  //console.log(result.insertId);
-  //console.dir(result);
-  //console.log(`result ${result}`);
+
   console.log("returning home after register post");
   res.render("home");
 });
