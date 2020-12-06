@@ -3,6 +3,8 @@ const path = require("path");
 const handlebars = require("express-handlebars");
 const mysql = require("mysql");
 const dotenv = require("dotenv");
+// Random function helper used to get random splashpage image
+const { randomNum } = require("./static/js/randomNum.js")
 
 //Load Config
 dotenv.config({ path: "./.env", debug: false });
@@ -56,7 +58,8 @@ app.get("/packages", (req, res) => {
 app.get("/", (req, res) => {
   console.log(req.query);
   console.log("render home");
-  res.render("home", { skipIntro: req.query.skipIntro });
+  // the home page is injected with some values that determine whether the intro happens, and what splash image to show
+  res.render("home", { skipIntro: req.query.skipIntro, introSplashNumber : `${randomNum(6)}`});
 });
 
 // Feisty template render for Contact page, requires nested queries fed into a complicated template
