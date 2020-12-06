@@ -1,6 +1,7 @@
 // Base code thanks to Corey Roth at https://codepen.io/coreyroth/pen/zGgNeN
 // Additional functionality to accept 10 or 11 digit codes done by [Eric]
 
+
 // This function runs every time a key is pressed in the phone input
 function phoneMask() { 
     
@@ -16,5 +17,6 @@ function phoneMask() {
         $(this).val(num.substring(0,1) + '(' + num.substring(1,4) + ')' + num.substring(4,7) + '-' + num.substring(7,11)); 
     }
 }
+
 // This tells the function to apply to all telephone inputs upon each keystroke
-$('[type="tel"]').keyup(phoneMask);
+$('#pNumber').keyup(phoneMask);

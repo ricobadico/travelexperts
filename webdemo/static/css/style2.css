@@ -2,14 +2,14 @@
 
 html,body{
   margin:0;
-  height:120%;
+  height:100%;
   font-family: 'Josefin Sans', sans-serif;
 }
 
 body {
 
  /* font-family: tahoma;*/
-  background-image: url("..//media/leaves3.jpg");
+  background-image: url("..//media/beach2.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -20,7 +20,7 @@ body {
   border-radius: 25px;
   padding: 20px ;
   margin-bottom: 30px;
-  background-color: #f7f5ec;
+  background-color: rgba(247,245,236,.9);
   text-align: center;
   overflow: hidden;
   position: relative;
@@ -37,5 +37,5 @@ body {
     padding-top: 30px;
     padding-bottom: 30px;
     color: inherit;
-    background-color: #D3D3D3;
+    background-color: rgba(211,211,211,.9);
 }
