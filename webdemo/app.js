@@ -25,7 +25,6 @@ if (process.env.NODE_ENV === "development") {
   // log req res in dev
   app.use(morgan("dev"));
 }
-//app.use(cookieParser());
 //  Set handlebars as view engine
 app.set("view engine", "handlebars");
 app.engine("handlebars", handlebars({ extname: "handlebars" }));
@@ -33,7 +32,7 @@ app.engine("handlebars", handlebars({ extname: "handlebars" }));
 // session to identify unique client session and login auth
 app.use( 
   session({
-    id : (req) => {
+    genid : (req) => {
         return uuid.uuidv4();
     },
     secret: process.env.SECRET,
