@@ -1,0 +1,54 @@
+<link rel="stylesheet" href='/css/order.css'>
+{{>jumbotron}}
+<!-- Navbar -->
+{{>navbar}}
+<div class="container">
+    <!--Elements within transparent box -->
+    <div class="orderBox">
+        <h1><i> Thank You For Your Order</i> </h1>
+        <hr />
+        <div class="container">
+            <div class="row">
+                <div class="col-sm">
+                    <h2> Order Number:</h2>
+                </div>
+                <div class="col-sm">
+                    <h2>{A12345} </h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <h2>Order Date: </h2>
+                </div>
+                <div class="col-sm">
+                    <h2>Date()</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <h2>Customer:</h2>
+                </div>
+                <div class="col-sm">
+                    <h2>{John Doe}</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <h2>Description:</h2>
+                </div>
+                <div class="col-sm">
+                    <h2>{product description}</h2>
+                </div>
+            </div>
+
+        </div>
+
+        <hr />
+        <div class="Summary">
+            <h2> A conformation email will be sent to {the registered email} shortly</h2>
+            <p> If the information above is correct please proceed to checkout!</p>
+        </div>
+        <a href="/" class="btn btn-info">Checkout </a>
+    </div>
+</div>
+</div>

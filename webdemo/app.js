@@ -88,6 +88,17 @@ app.get("/packages", (req, res) => {
   res.render("packages", packagesInput);
 });
 
+// Orders Page 
+app.get("/orders", (req, res) => {
+
+    const ordersInput = { 
+    Title: "Your Order",
+    Subtitle: "Finish your planning "
+    }
+  console.log("render orders");
+  res.render("orders", ordersInput);
+});
+
 app.get("/", (req, res) => {
   //res.writeHead(200, { "Content-Type": "text/html" });
   //console.log(req.query);
