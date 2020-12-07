@@ -143,19 +143,28 @@ app.get("/contact", (req, res) => {
   let contactInputs = { Agencies: [] };
 
   // Query 1 : get the data. results[0] is the array of agencies, results[1] the array of agents
-  connection.query(
-    "SELECT * FROM agencies; SELECT * from agents",
-    (err, results) => {
-      if (err) {
-        console.error(err);
-      } //throw new Error("Failed to load agency table from database");
-      const agencies = results[0];
-      const agents = results[1];
+  connection.query("SELECT * FROM agencies; SELECT * from agents", function (
+    error,
+    results
+  ) {
+    if (error) {
+      console.log(error);
+    } //throw new Error("Failed to load agency table from database");
+    const agencies = results[0];
+    const agents = results[1];
 
-      // For each agency pulled up in that query, we've got some work to do
-      for (let i in agencies) {
-        // Add that agency as an entry to the agency array
-        contactInputs.Agencies.push(agencies[i]);
+    // For each agency pulled up in that query, we've got some work to do
+    for (let i in agencies) {
+      // Add that agency as an entry to the agency array
+      contactInputs.Agencies.push(agencies[i]);
+
+      // Add an empty array element for agents (to be filled below)
+      contactInputs.Agencies[i].agents = [];
+    }
+
+    // Now we iterate through agents and assign them to their proper agencies
+    for (let j in agents) {
+      homeAgency = agents[j].AgencyId;
 
       // here, we are adding the current agent to the agency at the index corresponding to their id (which is -1)
       contactInputs.Agencies[homeAgency - 1].agents.push(agents[j]);
