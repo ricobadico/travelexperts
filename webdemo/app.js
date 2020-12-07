@@ -24,9 +24,9 @@ dotenv.config({ path: "./.env", debug: false });
 const PORT = process.env.PORT || 8000;
 
 // Setup Express Middleware ---------------------------------//
-
+app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // parse url
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "dev") {
   // log req res in dev
   app.use(morgan("dev"));
 }
@@ -37,18 +37,25 @@ app.engine("handlebars", handlebars({ extname: "handlebars" }));
 // session to identify unique client session and login auth
 app.use( 
   session({
-    id : (req) => {
+    genid : (req) => {
+        console.log(`In Session middleware sessionId: ${req.sessionID}`);
         return uuid.v4();
     },
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {},
     store: new RedisStore({ client: redisClient})
   })
 );
 app.use("/", express.static(path.join(__dirname, "static")));
 
+//app.use((req, res, next) => {
+//  if (req.cookies.user_sid && !req.session.user) {
+//    res.clearCookie("user_sid");
+//  }
+//  next();
+//});
 //  HELPERS ---------------------------------//
 
 // Start the express server listen for requests and send responses
@@ -67,23 +74,22 @@ app.listen(PORT, () => {
 
 // ROUTES ---------------------------------//
 app.get("/register", (req, res) => {
-
   // This data gets passed into the template (in this case, for the header)
   const registerInputs = {
     Title: "Register",
-    Subtitle: "Register for an account to stay up to date on our hottest deals."
-  }
+    Subtitle:
+      "Register for an account to stay up to date on our hottest deals.",
+  };
 
   console.log("render register");
   res.render("register", registerInputs);
 });
 
 app.get("/packages", (req, res) => {
-
   packagesInput = {
     Title: "Our Packages",
-    Subtitle: "Find the perfect upcoming trip for you."
-  }
+    Subtitle: "Find the perfect upcoming trip for you.",
+  };
   console.log("render packages");
   res.render("packages", packagesInput);
 });
@@ -93,7 +99,10 @@ app.get("/", (req, res) => {
   //console.log(req.query);
   console.log("render home");
   // the home page is injected with some values that determine whether the intro happens, and what splash image to show
-  res.render("home", { skipIntro: req.query.skipIntro, introSplashNumber : `${randomNum(6)}`});
+  res.render("home", {
+    skipIntro: req.query.skipIntro,
+    introSplashNumber: `${randomNum(6)}`,
+  });
 });
 
 // for testing the login
@@ -103,7 +112,9 @@ app.get("/sessionTest", (req, res, next) => {
     res.setHeader("Content-Type", "text/html");
     res.write("<p>views: " + req.session.views + "</p>");
     res.write("<p>expires in: " + req.session.cookie.maxAge / 1000 + "s</p>");
+    res.write("<p>user email is " + req.session.email + "</p>");
     console.log(`This sessions unique id: ${req.session.id}`);
+
     res.end();
   } else {
     req.session.views = 1;
@@ -171,8 +182,9 @@ app.get("/contact", (req, res) => {
     }
     // With the heavy lifting done, we can add any other needed data for the template, in this case the header information
     contactInputs.Title = "Contact Us";
-    contactInputs.Subtitle = "Contact one of our international travel agents for inquiries on your next travel destination."
-   
+    contactInputs.Subtitle =
+      "Contact one of our international travel agents for inquiries on your next travel destination.";
+
     console.log("render contacts");
     // We now have all the data needed to populate the template, in the form the template is expecting
     // prettier-ignore
