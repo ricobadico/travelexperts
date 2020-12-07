@@ -79,19 +79,6 @@ app.get("/register", (req, res) => {
   res.render("register", registerInputs);
 });
 
-// // renders thank you page after registering
-// app.get("/success", (req, res) => {
-//   // This data gets passed into the template (in this case, for the header)
-//   const rThanksHeader = {
-//     Title: "Success!",
-//     Subtitle: "Your registration was successful"
-//   }
-//   console.log("render register thanks");
-//   res.render("registerThanks", rThanksHeader);
-// });
-
-
-
 app.get("/packages", (req, res) => {
 
   packagesInput = {
@@ -119,21 +106,13 @@ app.post("/orders", (req, res) => {
     const ordersInput = { 
     Title: "Your Order",
     Subtitle: "Finish your planning "
+    
     }
   console.log("render orders");
   res.render("orders", ordersInput);
 });
 
-// renders thank you page after ordering
-app.get("/thankyou", (req, res) => {
-  // This data gets passed into the template (in this case, for the header)
-  const oThanksHeader = {
-    Title: "Thank you!",
-    Subtitle: "Your order was successfully processed."
-  }
-  console.log("render orders thanks");
-  res.render("ordersThanks", oThanksHeader);
-});
+
 
 app.get("/", (req, res) => {
   //res.writeHead(200, { "Content-Type": "text/html" });
@@ -324,6 +303,7 @@ app.post("/registerPOST", (req, res) => {
     // The user sent a request "/registerPOST" and is expecting a response! You need to tell the response to do something before we finish this express method call.
     // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
   });
+  // define registration thank you page variables which includes customer first name
   const rThanksHeader = {
     Title: "Success!",
     Subtitle: "Your registration was successful",
@@ -331,5 +311,6 @@ app.post("/registerPOST", (req, res) => {
   }
   console.log("returning thank you page after register post");
   console.log(req.body.firstName);
+  // render registration thank you page
   res.render("registerThanks", rThanksHeader);
 });
