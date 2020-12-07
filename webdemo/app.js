@@ -84,6 +84,43 @@ app.get("/packages", (req, res) => {
     Title: "Our Packages",
     Subtitle: "Find the perfect upcoming trip for you."
   }
+
+  // Create an array of objects under the packagesInput.packages property
+  packagesInput.Packages = [
+    {
+      PackageId: "1",
+      PkgName: "Carribbean Magic",
+      PkgDesc: "Wow cool",
+      PkgStartDate: "December 15",
+      PkgEndDate: "Jan 1",
+      PkgBasePrice: "One Million"
+    },
+    {
+      PackageId: "2",
+      PkgName: "Iceland Magic",
+      PkgDesc: "Wow neat",
+      PkgStartDate: "December 16",
+      PkgEndDate: "Jan 2",
+      PkgBasePrice: "One Billion"
+    },
+    {
+      PackageId: "3",
+      PkgName: "Monkey Magic",
+      PkgDesc: "Wow wild",
+      PkgStartDate: "December 18",
+      PkgEndDate: "Jan 1",
+      PkgBasePrice: "One Trillion"
+    },
+    {
+      PackageId: "4",
+      PkgName: "Art Magic",
+      PkgDesc: "Wow fancy",
+      PkgStartDate: "December 16",
+      PkgEndDate: "Jan 2",
+      PkgBasePrice: "One Dollar"
+    }
+  ]
+  console.log({packagesInput});
   console.log("render packages");
   res.render("packages", packagesInput);
 });
