@@ -79,16 +79,16 @@ app.get("/register", (req, res) => {
   res.render("register", registerInputs);
 });
 
-// renders thank you page after registering
-app.get("/success", (req, res) => {
-  // This data gets passed into the template (in this case, for the header)
-  const rThanksHeader = {
-    Title: "Success!",
-    Subtitle: "Your registration was successful"
-  }
-  console.log("render register thanks");
-  res.render("registerThanks", rThanksHeader);
-});
+// // renders thank you page after registering
+// app.get("/success", (req, res) => {
+//   // This data gets passed into the template (in this case, for the header)
+//   const rThanksHeader = {
+//     Title: "Success!",
+//     Subtitle: "Your registration was successful"
+//   }
+//   console.log("render register thanks");
+//   res.render("registerThanks", rThanksHeader);
+// });
 
 
 
@@ -324,7 +324,12 @@ app.post("/registerPOST", (req, res) => {
     // The user sent a request "/registerPOST" and is expecting a response! You need to tell the response to do something before we finish this express method call.
     // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
   });
-
-  console.log("returning home after register post");
-  res.render("home");
+  const rThanksHeader = {
+    Title: "Success!",
+    Subtitle: "Your registration was successful",
+    CustFirstName: req.body.firstName
+  }
+  console.log("returning thank you page after register post");
+  console.log(req.body.firstName);
+  res.render("registerThanks", rThanksHeader);
 });
