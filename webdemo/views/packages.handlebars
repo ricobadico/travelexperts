@@ -28,7 +28,8 @@
                     Price: ${{PkgBasePrice}}
                 </div>
                 {{!-- Button is wrapped in a form so it submits as a post request --}}
-                <form action="packagesPOST?pkgid={{PackageId}}" method="post">
+                <form action="packagesToOrder" method="post">
+                    <input type="hidden" id="packageId" name="packageId" value="{{PackageId}}">
                     <input type="submit" name="Order" value="Order" />
                 </form>
             </div>
