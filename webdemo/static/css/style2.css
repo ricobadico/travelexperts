@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css?family=Josefin+Sans:400,400i,600,600i');
 
 html,body{
@@ -14,8 +15,11 @@ body {
   background-position: center;
   background-attachment: fixed;
 }
-
-
+/* colourizes input values */
+input[name]{
+  background-color:#B9EEFB;
+}
+/* defines registration form */
 .registrationForm {
   border-radius: 25px;
   padding: 20px ;
@@ -25,8 +29,3 @@ body {
   overflow: hidden;
   position: relative;
 }
-
-.bg-input {
-    background-color:#B9EEFB;
-}
-
