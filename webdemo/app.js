@@ -78,6 +78,21 @@ app.get("/register", (req, res) => {
   res.render("register", registerInputs);
 });
 
+// testing thank you
+app.get("/thankyou", (req, res) => {
+
+  // This data gets passed into the template (in this case, for the header)
+  const thanksHeader = {
+    Title: "Success!",
+    Subtitle: "Your registration was successful"
+  }
+
+  console.log("render thanks");
+  res.render("registerThanks", thanksHeader);
+});
+
+
+
 app.get("/packages", (req, res) => {
 
   packagesInput = {
@@ -132,6 +147,11 @@ app.get("/error", (req, res) => {
 app.post("/error", (req, res) => {
   res.render("error", { httpcode: res.status, message: "Error Message" });
 });
+
+
+
+
+
 
 // Feisty template render for Contact page, requires nested queries fed into a complicated template
 // It works but occasionally fails to pull from the db, I'll work on it
