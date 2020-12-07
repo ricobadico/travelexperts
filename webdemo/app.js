@@ -78,6 +78,19 @@ app.get("/register", (req, res) => {
   res.render("register", registerInputs);
 });
 
+// renders thank you page after registering
+app.get("/success", (req, res) => {
+  // This data gets passed into the template (in this case, for the header)
+  const rThanksHeader = {
+    Title: "Success!",
+    Subtitle: "Your registration was successful"
+  }
+  console.log("render register thanks");
+  res.render("registerThanks", rThanksHeader);
+});
+
+
+
 app.get("/packages", (req, res) => {
 
   packagesInput = {
@@ -136,6 +149,17 @@ app.get("/orders", (req, res) => {
   res.render("orders", ordersInput);
 });
 
+// renders thank you page after ordering
+app.get("/thankyou", (req, res) => {
+  // This data gets passed into the template (in this case, for the header)
+  const oThanksHeader = {
+    Title: "Thank you!",
+    Subtitle: "Your order was successfully processed."
+  }
+  console.log("render orders thanks");
+  res.render("ordersThanks", oThanksHeader);
+});
+
 app.get("/", (req, res) => {
   //res.writeHead(200, { "Content-Type": "text/html" });
   //console.log(req.query);
@@ -180,6 +204,7 @@ app.get("/error", (req, res) => {
 app.post("/error", (req, res) => {
   res.render("error", { httpcode: res.status, message: "Error Message" });
 });
+
 
 // Feisty template render for Contact page, requires nested queries fed into a complicated template
 // It works but occasionally fails to pull from the db, I'll work on it
