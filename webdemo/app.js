@@ -11,6 +11,7 @@ const redis = require("redis");
 const session = require("express-session");
 const uuid = require("uuid");
 const bcrypt = require("bcrypt");
+const { connected } = require("process");
 const saltRounds = 10;
 
 const RedisStore = require("connect-redis")(session);
@@ -97,49 +98,23 @@ app.get("/packages", (req, res) => {
     Title: "Our Packages",
     Subtitle: "Find the perfect upcoming trip for you."
   }
+  let connection = getConnection();
+  connection.connect();
 
-  // Create an array of objects under the packagesInput.packages property
-  packagesInput.Packages = [
-    {
-      PackageId: "1",
-      PkgName: "Carribbean Magic",
-      PkgDesc: "Wow cool",
-      PkgStartDate: "December 15",
-      PkgEndDate: "Jan 1",
-      PkgBasePrice: "One Million"
-    },
-    {
-      PackageId: "2",
-      PkgName: "Iceland Magic",
-      PkgDesc: "Wow neat",
-      PkgStartDate: "December 16",
-      PkgEndDate: "Jan 2",
-      PkgBasePrice: "One Billion"
-    },
-    {
-      PackageId: "3",
-      PkgName: "Monkey Magic",
-      PkgDesc: "Wow wild",
-      PkgStartDate: "December 18",
-      PkgEndDate: "Jan 1",
-      PkgBasePrice: "One Trillion"
-    },
-    {
-      PackageId: "4",
-      PkgName: "Art Magic",
-      PkgDesc: "Wow fancy",
-      PkgStartDate: "December 16",
-      PkgEndDate: "Jan 2",
-      PkgBasePrice: "One Dollar"
-    }
-  ]
-  console.log({packagesInput});
-  console.log("render packages");
-  res.render("packages", packagesInput);
+  connection.query('SELECT * FROM packages', (err, result) => {
+    if (err) console.log(err);
+
+    packagesInput.Packages = result;
+  
+    console.log(packagesInput);
+    console.log("render packages");
+    res.render("packages", packagesInput);
+    connection.end();
+  });
 });
 
 // Orders Page 
-app.get("/orders", (req, res) => {
+app.post("/orders", (req, res) => {
 
     const ordersInput = { 
     Title: "Your Order",
