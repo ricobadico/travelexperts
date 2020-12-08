@@ -121,7 +121,8 @@ footer {
     background-color: rgba(247,245,236,.9);
     display:flex;
     justify-content: flex-end;
-    align-items: center;
+    text-align: center;
+    /* align-items: center; */
     box-shadow: 0 -5px 10px rgba(90, 90, 90, .6);
     margin-top: 50px;
 }
