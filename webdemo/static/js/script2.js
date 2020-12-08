@@ -19,43 +19,6 @@ function checkPcode() {
 }
 
 // checks phone number validity
-<<<<<<< HEAD
-function checkNumber() {
-  var text = document.getElementById("pNumber");
-  var exp = /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}\s.?[\s.-]?\d{4}$/;
-  if (exp.test(text.value));
-  else {
-    alert("This phone number is invalid, please enter a valid phone number");
-    pNumber.focus();
-  }
-}
-
-// disable form submissions if there are invalid fields
-(function () {
-  "use strict";
-  window.addEventListener(
-    "load",
-    function () {
-      // Get the forms we want to add validation styles to
-      var forms = document.getElementsByClassName("needs-validation");
-      // Loop over them and prevent submission
-      var validation = Array.prototype.filter.call(forms, function (form) {
-        form.addEventListener(
-          "submit",
-          function (event) {
-            if (form.checkValidity() === false) {
-              event.preventDefault();
-              event.stopPropagation();
-            }
-            form.classList.add("was-validated");
-          },
-          false
-        );
-      });
-    },
-    false
-  );
-=======
 function checkNumber(){
 	var text = document.getElementById("pNumber"); 
 	var exp = /^(1[ \-\+]{0,3}|\+1[ -\+]{0,3}|\+1|\+)?((\(\+?1-[2-9][0-9]{1,2}\))|(\(\+?[2-8][0-9][0-9]\))|(\(\+?[1-9][0-9]\))|(\(\+?[17]\))|(\([2-9][2-9]\))|([ \-\.]{0,3}[0-9]{2,4}))?([ \-\.][0-9])?([ \-\.]{0,3}[0-9]{2,4}){2,3}$/;
@@ -84,6 +47,5 @@ function checkNumber(){
       }, false);
     });
   }, false);
->>>>>>> thankYou
 })();
 
