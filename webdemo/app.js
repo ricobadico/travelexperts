@@ -54,7 +54,7 @@ app.use(
         return uuid.v4();
     },
     secret: process.env.SECRET,
-    resave: true,
+    resave: false,
     saveUninitialized: true,
     cookie: {
         maxAge: 600000,
@@ -233,15 +233,17 @@ app.get("/", (req, res) => {
 });
 
 app.post("/login", (req, res, next) => {
+  session.Des;
   let connection = getConnection();
   connection.connect();
   let dbResult;
+  let resultId;
 
   let message = "";
   let sql = "SELECT * FROM ?? WHERE ?? = ?";
   let inserts = ["web_credentials", "Username", req.body.username];
   sql = mysql.format(sql, inserts);
-  connection.query(sql, (err, results) => {
+  connection.query(sql, async (err, results) => {
     if (err) {
       console.error(err);
       connection.end();
@@ -250,18 +252,7 @@ app.post("/login", (req, res, next) => {
       console.log(results);
       dbResult = results;
       console.log(req.body.password);
-      console.log(results[0].Hash);
-      console.log(dbResult[0].Hash);
-      let a = async () => {
-        console.log("one");
-        let b = await bcrypt.compare(req.body.password, results[0].Hash);
-        console.log(b);
-        console.log("two");
-        return b;
-      };
-      console.log(a);
-      console.log(bcrypt.compareSync(req.body.password, results[0].Hash));
-      bcrypt.compare(req.body.password, results[0].Hash, function (
+      await bcrypt.compare(req.body.password, results[0].Hash, function (
         err,
         result
       ) {
@@ -281,10 +272,19 @@ app.post("/login", (req, res, next) => {
           //do some redirect
         }
       });
+      console.log("in login conn dbResult");
+      console.dir(dbResult);
+      console.log(`id: ${dbResult[0].CustomerId}`);
+      console.dir(req.session);
+      if (dbResult) {
+        req.session.uid = dbResult[0].CustomerId;
+        req.session.save();
+      }
       connection.end();
     }
   });
-
+  // so the problem is that the code in queries excutes after below and after the req.end()
+  req.session.email = "testString2";
   res.setHeader("Content-Type", "text/html");
   res.write("<p>Post Query OK</p>");
   res.write(`<p>${message}</p>`);
@@ -371,7 +371,7 @@ app.post("/registerPOST", (req, res) => {
   // Use a mysql connection's built-in query function to query the database. First argument is the SQL query, second argument defines placeholders ('?') in that query.
   // Third argument is the callback that happens once you've successfully gotten back the data (or an error) from the database
   let recordId;
-  connection.query(sql, (err, result) => {
+  connection.query(sql, async (err, result) => {
     if (err) {
       connection.end();
       console.error(err);
@@ -386,7 +386,7 @@ app.post("/registerPOST", (req, res) => {
     connection.end();
     // if the customer was inserted we take that record and
     // use it insert and save the salted password hash to the db.
-    bcrypt.hash(pwd, saltRounds, (err, hash) => {
+    await bcrypt.hash(pwd, saltRounds, async (err, hash) => {
       // Store hash in your password DB.
       if (err) {
         console.error(err);
@@ -401,7 +401,7 @@ app.post("/registerPOST", (req, res) => {
           "INSERT INTO `web_credentials` (`CustomerId`, `Username`, `Hash`) VALUES (?,?,?)";
         inserts = [recordId, userName, hash];
         sql = mysql.format(sql, inserts);
-        connection2.query(sql, (err, result) => {
+        await connection2.query(sql, (err, result) => {
           if (err) {
             connection2.end();
             console.error(err);
@@ -471,7 +471,7 @@ app.get("/sessionTest", (req, res, next) => {
 });
 // for testing the login
 app.get("/sessionTest22", (req, res, next) => {
-  if (req.session.uuid) {
+  if (req.session.uid) {
     console.log("-----------test2---------------");
     res.setHeader("Content-Type", "text/html");
     res.write("<p>user: " + req.session.uuid + "</p>");
