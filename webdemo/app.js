@@ -19,6 +19,7 @@ const redisClient = redis.createClient();
 let user_id;
 let user_email;
 let recentSessions = {};
+let loggedIn = false;
 
 //prettier-ignore
 function User(id, firstName, lastName, email) {
@@ -54,7 +55,7 @@ app.use(
         return uuid.v4();
     },
     secret: process.env.SECRET,
-    resave: true,
+    resave: false,
     saveUninitialized: true,
     cookie: {
         maxAge: 600000,
@@ -66,12 +67,14 @@ app.use(
 
 app.use("/", express.static(path.join(__dirname, "static")));
 
-//app.use((req, res, next) => {
-//  if (req.cookies.user_sid && !req.session.user_id) {
-//    res.clearCookie("user_sid");
-//  }
-//  next();
-//});
+app.use((req, res, next) => {
+  if (!session.sessionID && !req.session.uid) {
+    loggedIn = false;
+  } else {
+    loggedIn = true;
+  }
+  next();
+});
 
 // Middleware ------------------------------//
 
@@ -259,58 +262,59 @@ app.get("/", (req, res) => {
 });
 
 app.post("/login", (req, res, next) => {
+  session.Des;
   let connection = getConnection();
   connection.connect();
   let dbResult;
+  let resultId;
 
   let message = "";
   let sql = "SELECT * FROM ?? WHERE ?? = ?";
   let inserts = ["web_credentials", "Username", req.body.username];
   sql = mysql.format(sql, inserts);
-  connection.query(sql, (err, results) => {
+  connection.query(sql, async (err, results) => {
     if (err) {
       console.error(err);
-      connection.end();
+      await connection.end();
       // should redirect to error page
     } else {
       console.log(results);
       dbResult = results;
       console.log(req.body.password);
-      console.log(results[0].Hash);
-      console.log(dbResult[0].Hash);
-      let a = async () => {
-        console.log("one");
-        let b = await bcrypt.compare(req.body.password, results[0].Hash);
-        console.log(b);
-        console.log("two");
-        return b;
-      };
-      console.log(a);
-      console.log(bcrypt.compareSync(req.body.password, results[0].Hash));
-      bcrypt.compare(req.body.password, results[0].Hash, function (
-        err,
-        result
-      ) {
-        if (err) {
-          console.error(err);
-          // do some redirect
-          connection.end();
-        } else if (result) {
-          //true
-          message = "passwords match";
-          console.log(message);
-        } else {
-          // false
-          console.log(result);
-          message = "password do not match";
-          console.log(message);
-          //do some redirect
+      await bcrypt.compare(
+        req.body.password,
+        results[0].Hash,
+        async (err, result) => {
+          if (err) {
+            console.error(err);
+            // do some redirect
+            connection.end();
+          } else if (result) {
+            //true
+            message = "passwords match";
+            console.log(message);
+          } else {
+            // false
+            console.log(result);
+            message = "password do not match";
+            console.log(message);
+            //do some redirect
+          }
         }
-      });
-      connection.end();
+      );
+      console.log("in login conn dbResult");
+      console.dir(dbResult);
+      console.log(`id: ${dbResult[0].CustomerId}`);
+      console.dir(req.session);
+      if (dbResult) {
+        req.session.uid = dbResult[0].CustomerId;
+        await req.session.save();
+      }
+      await connection.end();
     }
   });
-
+  // so the problem is that the code in queries excutes after below and after the req.end()
+  req.session.email = "testString2";
   res.setHeader("Content-Type", "text/html");
   res.write("<p>Post Query OK</p>");
   res.write(`<p>${message}</p>`);
@@ -397,9 +401,9 @@ app.post("/registerPOST", (req, res) => {
   // Use a mysql connection's built-in query function to query the database. First argument is the SQL query, second argument defines placeholders ('?') in that query.
   // Third argument is the callback that happens once you've successfully gotten back the data (or an error) from the database
   let recordId;
-  connection.query(sql, (err, result) => {
+  connection.query(sql, async (err, result) => {
     if (err) {
-      connection.end();
+      await connection.end();
       console.error(err);
       throw Error;
     }
@@ -409,10 +413,10 @@ app.post("/registerPOST", (req, res) => {
     recentSessions[req.session.id] = user;
     //console.log(result.insertId);
 
-    connection.end();
+    await connection.end();
     // if the customer was inserted we take that record and
     // use it insert and save the salted password hash to the db.
-    bcrypt.hash(pwd, saltRounds, (err, hash) => {
+    await bcrypt.hash(pwd, saltRounds, async (err, hash) => {
       // Store hash in your password DB.
       if (err) {
         console.error(err);
@@ -427,18 +431,18 @@ app.post("/registerPOST", (req, res) => {
           "INSERT INTO `web_credentials` (`CustomerId`, `Username`, `Hash`) VALUES (?,?,?)";
         inserts = [recordId, userName, hash];
         sql = mysql.format(sql, inserts);
-        connection2.query(sql, (err, result) => {
+        connection2.query(sql, async (err, result) => {
           if (err) {
             connection2.end();
             console.error(err);
           } else {
             console.log(`Insert success: ${sql}`);
-            console.log(`Row Id = ${result.insertId}`);
-            req.session.userid = recordId;
-            console.log(`Store req.session.userid = ${req.session.userid}`);
+            console.log(`Row Id = ${recordId}`);
+            req.session.uid = recordId;
             req.session.email = email;
             console.log(`Store req.session.email = ${req.session.email}`);
-            connection2.end();
+            await req.session.save();
+            await connection2.end();
           }
         });
       }
@@ -451,8 +455,8 @@ app.post("/registerPOST", (req, res) => {
     // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
   });
 
-  req.session.uuid = recordId; // should add to
-  req.session.email = email;
+  //req.session.uuid = recordId; // should add to
+  //req.session.email = email;
   user_id = recordId; //for testing
   user_email = email; //for testing
   // create User object
@@ -474,48 +478,36 @@ app.get("/sessionTest", (req, res, next) => {
   if (req.session.views) {
     req.session.views++;
     console.dir(recentSessions);
+    console.log(`logged in: ${loggedIn}`);
 
     console.log(`user_id: ${user_id}`);
     console.log(`user_email: ${user_email}`);
+    console.log(`Logged in ${loggedIn}`);
+    console.log("-----------test---------------");
     res.setHeader("Content-Type", "text/html");
     res.write("<p>views: " + req.session.views + "</p>");
     res.write("<p>expires in: " + req.session.cookie.maxAge / 1000 + "s</p>");
     res.write("<p>user email is " + req.session.email + "</p>");
     console.log(`This sessions unique id: ${req.session.id}`);
+
+    res.write("<p>user: " + req.session.uuid + "</p>");
+    let now = Date(Date.now());
+    res.write("<p>Now: " + now.toString() + "</p>");
     console.dir(recentSessions[req.session.id]);
     console.dir(req.session);
     console.dir(session);
+    console.log("-----end------test---------------");
 
     res.end();
   } else {
-    console.log(`user_id: ${user_id}`);
-    console.log(`user_email: ${user_email}`);
+    if (req.session.uid) {
+      //console.log(`user_id: ${req.session.uid}`);
+    }
     req.session.views = 1;
     console.log(`This sessions unique id: ${req.session.id}`);
     res.end("welcome to the session demo. refresh!");
   }
 });
-// for testing the login
-app.get("/sessionTest22", (req, res, next) => {
-  if (req.session.uuid) {
-    console.log("-----------test2---------------");
-    res.setHeader("Content-Type", "text/html");
-    res.write("<p>user: " + req.session.uuid + "</p>");
-    res.write("<p>expires in: " + req.session.cookie.maxAge / 1000 + "s</p>");
-    let now = Date(Date.now());
-    res.write("<p>Now: " + now.toString() + "</p>");
-    console.log(`This sessions unique id: ${req.session.id}`);
-    console.dir(recentSessions[req.session.id]);
-    console.dir(req.session);
-    console.dir(session);
-    console.log("-----end------test2---------------");
-
-    res.end();
-  } else {
-    res.end("Please login");
-  }
-});
-
 // Start the express server listen for requests and send responses
 app.listen(PORT, () => {
   console.log(
