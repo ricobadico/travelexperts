@@ -20,11 +20,11 @@ let user_email;
 let recentSessions = {};
 
 //prettier-ignore
-function User(id, sessionId, firstName, lastName) {
-    (this.sessionId = sessionId),
+function User(id, firstName, lastName, email) {
     (this.userid = id),
     (this.firstName = firstName),
-    (this.lastName = lastName)
+    (this.lastName = lastName),
+    (this.email = email)
 }
 
 const app = express();
@@ -116,16 +116,28 @@ app.get("/", (req, res) => {
 });
 
 app.post("/login", (req, res, next) => {
-  console.log(req.body);
-  console.log(req.session);
-  // true/false to replace with validate funciton
-  if (false) {
-    //req.session.userid = "45";
-    //console.log(req.session);
-    res.send("<h1>Post Recieved<h1>");
-  } else {
-    res.redirect(400, "/error");
-  }
+  let connection = getConnection();
+  connection.connect();
+  let dbResult;
+
+  let sql = "SELECT * FROM ?? WHERE ?? = ?";
+  let inserts = ["web_credentials", "Username", req.body.username];
+  sql = mysql.format(sql, inserts);
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error(err);
+      connection.end();
+      // should redirect to error page
+    } else {
+      console.log(results);
+      dbResult = results;
+      connection.end();
+    }
+  });
+
+  res.setHeader("Content-Type", "text/html");
+  res.write("<p>Post Query OK</p>");
+  res.end();
 });
 
 app.get("/error", (req, res) => {
@@ -184,11 +196,11 @@ app.get("/contact", (req, res) => {
 });
 
 // Insert the Register data into the database. All the Register page form needs to do is have "registerPOST" as its action to fire this off
-app.post("/registerPOST", (req, res, next) => {
+app.post("/registerPOST", (req, res) => {
   // This is just fancy "javascript destructuring": assigns these variables to the corresponding properties of the req.body object
   // prettier-ignore
-  let { firstName, lastName, userName, pwd, email, pNumber, address, city, prov, pCode, sendInfo } = req.body;
-
+  let {firstName, lastName, userName, pwd, email, pNumber, address, city, prov, pCode, sendInfo} = req.body;
+  //console.log(req.body);
   // Use the defined connection config to connect
   let connection = getConnection();
   connection.connect();
@@ -201,15 +213,13 @@ app.post("/registerPOST", (req, res, next) => {
   let sql =
     "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal` , `CustBusPhone`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
   //prettier-ignore
-  let inserts = [firstName, lastName, email, pNumber, address, city, prov, pCode, pNumber ];
+  let inserts = [firstName, lastName, email, pNumber, address, city, prov, pCode, pNumber];
   sql = mysql.format(sql, inserts);
+  console.log(sql);
 
   // Use a mysql connection's built-in query function to query the database. First argument is the SQL query, second argument defines placeholders ('?') in that query.
   // Third argument is the callback that happens once you've successfully gotten back the data (or an error) from the database
   let recordId;
-  let userid;
-  let useremail;
-
   connection.query(sql, (err, result) => {
     if (err) {
       connection.end();
@@ -218,68 +228,62 @@ app.post("/registerPOST", (req, res, next) => {
     }
     // We're going to leave a console.log here just so anyone on the server can confirm that something happened
     recordId = result.insertId;
-    res.local.recordId = result.insertId;
-    console.log(`Inside conn1 ${result.insertId}`);
-    let user = new User(result.insertId, req.session.id, firstName, lastName);
-    // pass to active sessions
+    let user = new User(recordId, firstName, lastName, email);
     recentSessions[req.session.id] = user;
-    console.dir(recentSessions);
+    //console.log(result.insertId);
 
     connection.end();
-  });
+    // if the customer was inserted we take that record and
+    // use it insert and save the salted password hash to the db.
+    bcrypt.hash(pwd, saltRounds, (err, hash) => {
+      // Store hash in your password DB.
+      if (err) {
+        console.error(err);
+        console.log("unable to hash new password!");
+      } else {
+        //console.log(hash);
+        // Open a new connection and attempt the query
+        let connection2 = getConnection();
+        connection2.connect();
+        sql =
+          "INSERT INTO `web_credentials` (`CustomerId`, `Username`, `Hash`) VALUES (?,?,?)";
+        inserts = [recordId, userName, hash];
+        sql = mysql.format(sql, inserts);
+        connection2.query(sql, (err, result) => {
+          if (err) {
+            connection2.end();
+            console.error(err);
+          } else {
+            console.log(`Insert success: ${sql}`);
+            console.log(`Row Id = ${result.insertId}`);
+            req.session.userid = recordId;
+            console.log(`Store req.session.userid = ${req.session.userid}`);
+            req.session.email = email;
+            console.log(`Store req.session.email = ${req.session.email}`);
+            connection2.end();
+          }
+        });
+      }
+    });
 
-  console.log(`Outside ${recordId}`);
-  next();
-});
-
-app.post("/registerPOST", (res, req, next) => {
-  console.log("head of 2nd post");
-  console.log(`res.local.recordId: ${res.local.recordId}`);
-  console.dir(recentSessions);
-  let recordId = recentSessions[session.sessionId].userid;
-  console.log(`using id for hash ${recordId}`);
-  // hash password and save to database
-  bcrypt.hash(pwd, saltRounds, (err, hash) => {
-    // Store hash in your password DB.
-    if (err) {
-      console.error(err);
-      console.log("unable to hash new password!");
-    } else {
-      // Open a new connection and attempt the query
-      let connection2 = getConnection();
-      connection2.connect();
-      // Create and format Query
-      let sql =
-        "INSERT INTO `web_credentials` (`CustomerId`, `Username`, `Hash`) VALUES (?,?,?)";
-
-      inserts = [recordId, userName, hash];
-      sql = mysql.format(sql, inserts);
-      // Attempt Insert
-      connection2.query(sql, (err, result) => {
-        if (err) {
-          connection2.end();
-          console.error(err);
-        } else {
-          console.log(`Insert success: ${sql}`);
-
-          connection2.end();
-        }
-      });
-    }
+    // We've done what we needed and can close the mysql connection!
+    // The user sent a request "/registerPOST" and is expecting a response! You need to tell the response to do something before we finish this express method call.
+    // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
   });
   req.session.uuid = recordId; // should add to
   req.session.email = email;
   user_id = recordId; //for testing
   user_email = email; //for testing
   // create User object
-
-  res.render("contact");
+  console.dir(recentSessions);
+  res.render("home");
 });
 
 // for testing the login
 app.get("/sessionTest", (req, res, next) => {
   if (req.session.views) {
     req.session.views++;
+    console.dir(recentSessions);
 
     console.log(`user_id: ${user_id}`);
     console.log(`user_email: ${user_email}`);

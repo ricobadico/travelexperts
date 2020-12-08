@@ -39,4 +39,3 @@ const getConn = async () => {
 };
 
 module.exports = getConnection;
-module.exports = getConn;
