@@ -1,17 +1,16 @@
+<link rel="stylesheet" href="/css/style4.css">
+	
+{{> jumbotron}}
 
-	<div class="jumbotron text-center"  style="margin-bottom:0">
-		<div class="container">
-  			<h1>Success!</h1>
-  			<p>Your registration was successful</p>
-  		</div>
-	</div>
-
-{{ navbar}}
+{{> navbar}}
 
 <div class="container">
 	<div class="thankYou">	
-		<h4 class="text-center">Hi {{this.CustFirstName}}</h4>
-		<p class="text-center">Thank you for registering with Travel Experts</p>
+		<h4 class="text-center">Hi {{CustFirstName}}</h4>
+		<p class="text-center">Thank you for registering with Travel Experts.</p>
+		<p class="text-center">Here at Travel Experts we pride ourselves on providing our clients with the best vacation experience.</p>
+		<p class="text-center">Our competitive pricing along with outstanding customer service ensures a streamlined process to get you to the destination of your dreams!</p>
 		<p class="text-center">Please check your inbox for a confirmation email.</p>
+		<a href="/" class="btn btn-info">HOME</a>
 	</div>		
 </div>
