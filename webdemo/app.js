@@ -15,9 +15,23 @@ const saltRounds = 10;
 
 const RedisStore = require("connect-redis")(session);
 const redisClient = redis.createClient();
+let user_id;
+let user_email;
+let recentSessions = {};
+
+//prettier-ignore
+function User(id, sessionId, firstName, lastName) {
+    (this.sessionId = sessionId),
+    (this.userid = id),
+    (this.firstName = firstName),
+    (this.lastName = lastName)
+}
 
 const app = express();
-// In memory cache / data store
+
+//  Set handlebars as view engine
+app.set("view engine", "handlebars");
+app.engine("handlebars", handlebars({ extname: "handlebars" }));
 
 //Load Config Environment variables
 dotenv.config({ path: "./.env", debug: false });
@@ -30,9 +44,6 @@ if (process.env.NODE_ENV === "dev") {
   // log req res in dev
   app.use(morgan("dev"));
 }
-//  Set handlebars as view engine
-app.set("view engine", "handlebars");
-app.engine("handlebars", handlebars({ extname: "handlebars" }));
 // prettier-ignore
 // session to identify unique client session and login auth
 app.use( 
@@ -42,35 +53,31 @@ app.use(
         return uuid.v4();
     },
     secret: process.env.SECRET,
-    resave: false,
+    resave: true,
     saveUninitialized: true,
-    cookie: {},
-    store: new RedisStore({ client: redisClient})
+    cookie: {
+        maxAge: 600000,
+        secure: false
+    },
+    store: new RedisStore({ client: redisClient}),
   })
 );
+
 app.use("/", express.static(path.join(__dirname, "static")));
 
 //app.use((req, res, next) => {
-//  if (req.cookies.user_sid && !req.session.user) {
+//  if (req.cookies.user_sid && !req.session.user_id) {
 //    res.clearCookie("user_sid");
 //  }
 //  next();
 //});
-//  HELPERS ---------------------------------//
 
-// Start the express server listen for requests and send responses
-app.listen(PORT, () => {
-  console.log(
-    `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`
-  );
+// Middleware ------------------------------//
+
+// error handler
+app.use((err, req, res, next) => {
+  res.status(400).send(err.message);
 });
-
-//test
-//auth.genPasswordHash("password");
-//auth.checkPasswordHash(
-//  "password",
-//  `$2b$10$xpW2q/66FpNC6TjGDp3onehApNj5iiNwC/9s9vHsaWmKcxi470TpO`
-//);
 
 // ROUTES ---------------------------------//
 app.get("/register", (req, res) => {
@@ -95,6 +102,9 @@ app.get("/packages", (req, res) => {
 });
 
 app.get("/", (req, res) => {
+  if (recentSessions) {
+    console.dir(recentSessions);
+  }
   //res.writeHead(200, { "Content-Type": "text/html" });
   //console.log(req.query);
   console.log("render home");
@@ -105,31 +115,13 @@ app.get("/", (req, res) => {
   });
 });
 
-// for testing the login
-app.get("/sessionTest", (req, res, next) => {
-  if (req.session.views) {
-    req.session.views++;
-    res.setHeader("Content-Type", "text/html");
-    res.write("<p>views: " + req.session.views + "</p>");
-    res.write("<p>expires in: " + req.session.cookie.maxAge / 1000 + "s</p>");
-    res.write("<p>user email is " + req.session.email + "</p>");
-    console.log(`This sessions unique id: ${req.session.id}`);
-
-    res.end();
-  } else {
-    req.session.views = 1;
-    console.log(`This sessions unique id: ${req.session.id}`);
-    res.end("welcome to the session demo. refresh!");
-  }
-});
-
 app.post("/login", (req, res, next) => {
   console.log(req.body);
   console.log(req.session);
   // true/false to replace with validate funciton
   if (false) {
-    req.session.userid = "45";
-    console.log(req.session);
+    //req.session.userid = "45";
+    //console.log(req.session);
     res.send("<h1>Post Recieved<h1>");
   } else {
     res.redirect(400, "/error");
@@ -154,10 +146,8 @@ app.get("/contact", (req, res) => {
   let contactInputs = { Agencies: [] };
 
   // Query 1 : get the data. results[0] is the array of agencies, results[1] the array of agents
-  connection.query("SELECT * FROM agencies; SELECT * from agents", function (
-    error,
-    results
-  ) {
+  // prettier-ignore
+  connection.query("SELECT * FROM agencies; SELECT * from agents", function (error, results) {
     if (error) {
       console.log(error);
     } //throw new Error("Failed to load agency table from database");
@@ -194,23 +184,11 @@ app.get("/contact", (req, res) => {
 });
 
 // Insert the Register data into the database. All the Register page form needs to do is have "registerPOST" as its action to fire this off
-app.post("/registerPOST", (req, res) => {
+app.post("/registerPOST", (req, res, next) => {
   // This is just fancy "javascript destructuring": assigns these variables to the corresponding properties of the req.body object
   // prettier-ignore
-  let {
-    firstName,
-    lastName,
-    userName,
-    pwd,
-    email,
-    pNumber,
-    address,
-    city,
-    prov,
-    pCode,
-    sendInfo
-  } = req.body;
-  //console.log(req.body);
+  let { firstName, lastName, userName, pwd, email, pNumber, address, city, prov, pCode, sendInfo } = req.body;
+
   // Use the defined connection config to connect
   let connection = getConnection();
   connection.connect();
@@ -223,23 +201,15 @@ app.post("/registerPOST", (req, res) => {
   let sql =
     "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal` , `CustBusPhone`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
   //prettier-ignore
-  let inserts = [
-    firstName,
-    lastName,
-    email,
-    pNumber,
-    address,
-    city,
-    prov,
-    pCode,
-    pNumber
-  ];
+  let inserts = [firstName, lastName, email, pNumber, address, city, prov, pCode, pNumber ];
   sql = mysql.format(sql, inserts);
-  console.log(sql);
 
   // Use a mysql connection's built-in query function to query the database. First argument is the SQL query, second argument defines placeholders ('?') in that query.
   // Third argument is the callback that happens once you've successfully gotten back the data (or an error) from the database
   let recordId;
+  let userid;
+  let useremail;
+
   connection.query(sql, (err, result) => {
     if (err) {
       connection.end();
@@ -248,47 +218,113 @@ app.post("/registerPOST", (req, res) => {
     }
     // We're going to leave a console.log here just so anyone on the server can confirm that something happened
     recordId = result.insertId;
-    //console.log(result.insertId);
+    res.local.recordId = result.insertId;
+    console.log(`Inside conn1 ${result.insertId}`);
+    let user = new User(result.insertId, req.session.id, firstName, lastName);
+    // pass to active sessions
+    recentSessions[req.session.id] = user;
+    console.dir(recentSessions);
 
     connection.end();
-    // if the customer was inserted we take that record and
-    // use it insert and save the salted password hash to the db.
-    bcrypt.hash(pwd, saltRounds, (err, hash) => {
-      // Store hash in your password DB.
-      if (err) {
-        console.error(err);
-        console.log("unable to hash new password!");
-      } else {
-        //console.log(hash);
-        // Open a new connection and attempt the query
-        let connection2 = getConnection();
-        connection2.connect();
-        sql =
-          "INSERT INTO `web_credentials` (`CustomerId`, `Username`, `Hash`) VALUES (?,?,?)";
-        inserts = [recordId, userName, hash];
-        sql = mysql.format(sql, inserts);
-        connection2.query(sql, (err, result) => {
-          if (err) {
-            connection2.end();
-            console.error(err);
-          } else {
-            console.log(`Insert success: ${sql}`);
-            console.log(`Row Id = ${result.insertId}`);
-            req.session.userid = recordId;
-            console.log(`Store req.session.userid = ${req.session.userid}`);
-            req.session.email = email;
-            console.log(`Store req.session.email = ${req.session.email}`);
-            connection2.end();
-          }
-        });
-      }
-    });
-
-    // We've done what we needed and can close the mysql connection!
-    // The user sent a request "/registerPOST" and is expecting a response! You need to tell the response to do something before we finish this express method call.
-    // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
   });
 
-  console.log("returning home after register post");
-  res.render("home");
+  console.log(`Outside ${recordId}`);
+  next();
+});
+
+app.post("/registerPOST", (res, req, next) => {
+  console.log("head of 2nd post");
+  console.log(`res.local.recordId: ${res.local.recordId}`);
+  console.dir(recentSessions);
+  let recordId = recentSessions[session.sessionId].userid;
+  console.log(`using id for hash ${recordId}`);
+  // hash password and save to database
+  bcrypt.hash(pwd, saltRounds, (err, hash) => {
+    // Store hash in your password DB.
+    if (err) {
+      console.error(err);
+      console.log("unable to hash new password!");
+    } else {
+      // Open a new connection and attempt the query
+      let connection2 = getConnection();
+      connection2.connect();
+      // Create and format Query
+      let sql =
+        "INSERT INTO `web_credentials` (`CustomerId`, `Username`, `Hash`) VALUES (?,?,?)";
+
+      inserts = [recordId, userName, hash];
+      sql = mysql.format(sql, inserts);
+      // Attempt Insert
+      connection2.query(sql, (err, result) => {
+        if (err) {
+          connection2.end();
+          console.error(err);
+        } else {
+          console.log(`Insert success: ${sql}`);
+
+          connection2.end();
+        }
+      });
+    }
+  });
+  req.session.uuid = recordId; // should add to
+  req.session.email = email;
+  user_id = recordId; //for testing
+  user_email = email; //for testing
+  // create User object
+
+  res.render("contact");
+});
+
+// for testing the login
+app.get("/sessionTest", (req, res, next) => {
+  if (req.session.views) {
+    req.session.views++;
+
+    console.log(`user_id: ${user_id}`);
+    console.log(`user_email: ${user_email}`);
+    res.setHeader("Content-Type", "text/html");
+    res.write("<p>views: " + req.session.views + "</p>");
+    res.write("<p>expires in: " + req.session.cookie.maxAge / 1000 + "s</p>");
+    res.write("<p>user email is " + req.session.email + "</p>");
+    console.log(`This sessions unique id: ${req.session.id}`);
+    console.dir(recentSessions[req.session.id]);
+    console.dir(req.session);
+    console.dir(session);
+
+    res.end();
+  } else {
+    console.log(`user_id: ${user_id}`);
+    console.log(`user_email: ${user_email}`);
+    req.session.views = 1;
+    console.log(`This sessions unique id: ${req.session.id}`);
+    res.end("welcome to the session demo. refresh!");
+  }
+});
+// for testing the login
+app.get("/sessionTest22", (req, res, next) => {
+  if (req.session.uuid) {
+    console.log("-----------test2---------------");
+    res.setHeader("Content-Type", "text/html");
+    res.write("<p>user: " + req.session.uuid + "</p>");
+    res.write("<p>expires in: " + req.session.cookie.maxAge / 1000 + "s</p>");
+    let now = Date(Date.now());
+    res.write("<p>Now: " + now.toString() + "</p>");
+    console.log(`This sessions unique id: ${req.session.id}`);
+    console.dir(recentSessions[req.session.id]);
+    console.dir(req.session);
+    console.dir(session);
+    console.log("-----end------test2---------------");
+
+    res.end();
+  } else {
+    res.end("Please login");
+  }
+});
+
+// Start the express server listen for requests and send responses
+app.listen(PORT, () => {
+  console.log(
+    `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`
+  );
 });
