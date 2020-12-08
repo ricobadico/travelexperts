@@ -151,11 +151,6 @@ app.post("/orders", (req, res) => {
       console.log(ordersInput);
       console.log("render orders");
       res.render("orders", ordersInput);
-      //   packagesInput.Packages = result;
-
-      //   console.log(packagesInput);
-      //   console.log("render packages");
-      //   res.render("packages", packagesInput);
       connection.end();
     }
   );
