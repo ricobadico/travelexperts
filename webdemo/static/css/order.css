@@ -5,7 +5,10 @@ html, body {
     background-image: url("/media/leaves.jpg");
     background-repeat: no-repeat; 
     background-size: cover;
+<<<<<<< HEAD
+=======
     background-attachment: fixed;
+>>>>>>> main
 }
 
 .transparent { 
@@ -23,7 +26,8 @@ html, body {
 .transparent h1 {
     margin:0; 
     padding-left: 15px; 
-    color: black
+    color: black;
+
 }
 
 .transparent h2 { 
@@ -70,6 +74,20 @@ html, body {
     
 }
 
+/* colourizes input values */
+input[name]{
+    background-color:#B9EEFB;
+  }
+
+footer {
+    height: 36px;
+    background-color: rgba(247,245,236,.9);
+    display:flex;
+    justify-content: center;
+    align-items: flex-end;
+    box-shadow: 0 -5px 10px rgba(90, 90, 90, .6);
+    margin-top: auto;
+  }
 .order-form-input {
     font-size: 2rem;
     border-radius: 10px;
