@@ -5,6 +5,10 @@ html, body {
     background-image: url("/media/leaves.jpg");
     background-repeat: no-repeat; 
     background-size: cover;
+<<<<<<< HEAD
+=======
+    background-attachment: fixed;
+>>>>>>> main
 }
 
 .transparent { 
@@ -84,3 +88,12 @@ footer {
     box-shadow: 0 -5px 10px rgba(90, 90, 90, .6);
     margin-top: auto;
   }
+.order-form-input {
+    font-size: 2rem;
+    border-radius: 10px;
+    width:50px;
+    border:none;
+    box-shadow: 1px 1px 3px grey;
+    padding-left: 1rem;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+}
