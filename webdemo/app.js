@@ -120,6 +120,7 @@ app.post("/login", (req, res, next) => {
   connection.connect();
   let dbResult;
 
+  let message = "";
   let sql = "SELECT * FROM ?? WHERE ?? = ?";
   let inserts = ["web_credentials", "Username", req.body.username];
   sql = mysql.format(sql, inserts);
@@ -131,12 +132,45 @@ app.post("/login", (req, res, next) => {
     } else {
       console.log(results);
       dbResult = results;
+      console.log(req.body.password);
+      console.log(results[0].Hash);
+      console.log(dbResult[0].Hash);
+      let a = async () => {
+        console.log("one");
+        let b = await bcrypt.compare(req.body.password, results[0].Hash);
+        console.log(b);
+        console.log("two");
+        return b;
+      };
+      console.log(a);
+      console.log(bcrypt.compareSync(req.body.password, results[0].Hash));
+      bcrypt.compare(req.body.password, results[0].Hash, function (
+        err,
+        result
+      ) {
+        if (err) {
+          console.error(err);
+          // do some redirect
+          connection.end();
+        } else if (result) {
+          //true
+          message = "passwords match";
+          console.log(message);
+        } else {
+          // false
+          console.log(result);
+          message = "password do not match";
+          console.log(message);
+          //do some redirect
+        }
+      });
       connection.end();
     }
   });
 
   res.setHeader("Content-Type", "text/html");
   res.write("<p>Post Query OK</p>");
+  res.write(`<p>${message}</p>`);
   res.end();
 });
 
@@ -241,6 +275,7 @@ app.post("/registerPOST", (req, res) => {
         console.error(err);
         console.log("unable to hash new password!");
       } else {
+        console.log(`hash: ${hash}`);
         //console.log(hash);
         // Open a new connection and attempt the query
         let connection2 = getConnection();
@@ -264,12 +299,15 @@ app.post("/registerPOST", (req, res) => {
           }
         });
       }
+
+      console.log(bcrypt.compareSync(pwd, hash));
     });
 
     // We've done what we needed and can close the mysql connection!
     // The user sent a request "/registerPOST" and is expecting a response! You need to tell the response to do something before we finish this express method call.
     // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
   });
+
   req.session.uuid = recordId; // should add to
   req.session.email = email;
   user_id = recordId; //for testing
