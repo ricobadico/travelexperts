@@ -166,6 +166,32 @@ app.post("/orderPOST", (req, res) => {
   // First, we need to open a database connection:
   let connection = getConnection();
   connection.connect();
+  connection.query(
+    "SELECT * FROM packages where PackageId = ?",
+    req.body.packageId,
+    (err, result) => {
+      if (err) console.log(err);
+      ordersInput.PkgName = result[0].PkgName;
+      ordersInput.PkgBasePrice = result[0].PkgBasePrice;
+      ordersInput.PkgDesc = result[0].PkgDesc;
+      console.log(ordersInput);
+      console.log("render orders");
+      res.render("orders", ordersInput);
+      connection.end();
+    }
+  );
+});
+
+// ordersPOST renders thank you page after posting to database
+app.post("/orderPOST", (req, res) => {
+  // define orders thank you page variables
+  const oThanksHeader = {
+    Title: "Success!",
+    Subtitle: "Your purchase is processing",
+  };
+  console.log("returning thank you page after orders post");
+  // render registration thank you page
+  res.render("ordersThanks", oThanksHeader);
 
   //STEP 1 -----
   // TODO: Get all data needed to fill in a row of the bookings table in db

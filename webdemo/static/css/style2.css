@@ -29,3 +29,13 @@ input[name]{
   overflow: hidden;
   position: relative;
 }
+
+footer {
+  height: 36px;
+  background-color: rgba(247,245,236,.9);
+  display:flex;
+  justify-content: center;
+  align-items: flex-end;
+  box-shadow: 0 -5px 10px rgba(90, 90, 90, .6);
+  margin-top: auto;
+}
