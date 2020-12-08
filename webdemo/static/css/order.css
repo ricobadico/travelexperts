@@ -5,10 +5,7 @@ html, body {
     background-image: url("/media/leaves.jpg");
     background-repeat: no-repeat; 
     background-size: cover;
-<<<<<<< HEAD
-=======
     background-attachment: fixed;
->>>>>>> main
 }
 
 .transparent { 
