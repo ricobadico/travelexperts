@@ -11,6 +11,7 @@ const redis = require("redis");
 const session = require("express-session");
 const uuid = require("uuid");
 const bcrypt = require("bcrypt");
+const { connected } = require("process");
 const saltRounds = 10;
 
 const RedisStore = require("connect-redis")(session);
@@ -97,8 +98,124 @@ app.get("/packages", (req, res) => {
     Title: "Our Packages",
     Subtitle: "Find the perfect upcoming trip for you.",
   };
-  console.log("render packages");
-  res.render("packages", packagesInput);
+  let connection = getConnection();
+  connection.connect();
+  // TODO: Need to change this to only find packages in the future. This means we need to change dates in the db
+  connection.query("SELECT * FROM packages", (err, result) => {
+    if (err) console.log(err);
+
+    packagesInput.Packages = result;
+
+    console.log(packagesInput);
+    console.log("render packages");
+    res.render("packages", packagesInput);
+    connection.end();
+  });
+});
+
+// Orders Page - [Sheyi w/ Eric Assist]
+app.post("/orders", (req, res) => {
+  function formatDate(date) {
+    var d = new Date(date),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  }
+  date = formatDate(new Date());
+
+  const ordersInput = {
+    Title: "Your Order",
+    Subtitle: "Finish your planning ",
+    date: `${date}`,
+  };
+  let connection = getConnection();
+  connection.connect();
+  connection.query(
+    "SELECT * FROM packages where PackageId = ?",
+    req.body.packageId,
+    (err, result) => {
+      if (err) console.log(err);
+      ordersInput.PkgName = result[0].PkgName;
+      ordersInput.PkgBasePrice = result[0].PkgBasePrice;
+      ordersInput.PkgDesc = result[0].PkgDesc;
+      ordersInput.PkgStartDate = result[0].PkgStartDate;
+      ordersInput.PkgEndDate = result[0].PkgEndDate;
+      console.log(ordersInput);
+      console.log("render orders");
+      res.render("orders", ordersInput);
+      //   packagesInput.Packages = result;
+
+      //   console.log(packagesInput);
+      //   console.log("render packages");
+      //   res.render("packages", packagesInput);
+      connection.end();
+    }
+  );
+});
+
+// Orders Page Submit --> submits order confirmation, updating relevant db tables, go to thank you page [Eric]
+app.post("/orderPOST", (req, res) => {
+  // First, we need to open a database connection:
+  let connection = getConnection();
+  connection.connect();
+
+  //STEP 1 -----
+  // TODO: Get all data needed to fill in a row of the bookings table in db
+  // That includes BookingDate, BookingNo(?), TravelerCount, CustomerID, TripTypeId(?), PackageId
+  // Some of those values we aren't getting from anywhere (marked with a ?), let's leave them null
+  // Luckily, the rest we can get from req.body from the previous page
+  let BookingDate = new Date();
+  let TravelerCount = req.body.TravelerCount;
+  let CustomerId = req.body.CustomerId;
+  let PackageId = req.body.packageId;
+
+  // Then, do an INSERT INTO bookings query
+  // You need an SQL query first
+  let sql =
+    "INSERT INTO bookings (`BookingDate`, `TravelerCount`, `CustomerID`, `PackageId`) VALUES (?, ?, ?, ?)";
+  // Next, create an array of values to insert in the placeholders (the values getting inserted into the database in their respective columns)
+  let inserts = [BookingDate, TravelerCount, CustomerId, PackageId];
+  // This next line updates the sql to insert those placeholders in a tidy, attack-secure way (don't worry about it too much)
+  sql = mysql.format(sql, inserts);
+  // Finally the query
+  connection.query(sql, (err, result) => {
+    if (err) console.log(err);
+
+    //In the event of a successful insert, we can grab the newly inserted row's id out of the result object. We'll need it in the next insert query
+    let BookingId = result.insertId;
+
+    //STEP 2 -----------
+    // TODO Get all data needed to fill in a row of bookingdetails table in db
+    // That includes ItineraryNo(?), TripStart, TripEnd, Description, Destination(?), BasePrice, AgencyCommission(?), BookingId, RegionId(?), ClassId(?), FeeId(?), ProductSupplierId(?)
+    // Note we need BookingId which means we have to insert into the bookings table above first, then grab the id from the result
+    // The form will be fairly similar to the step 1 above. Note some values come from the package table (they aren't 3NF!) and we could do another query to get them...
+    // However, what we've done instead is send that info as hidden form data from /packages route to /orders to /packagesPOST, pulling them out of req.body
+    let TripStart = req.body.PkgStartDate;
+    let TripEnd = req.body.PkgEndDate;
+    let Description = req.body.PkgDesc;
+    let BasePrice = req.body.OrderTotalCost;
+    //Note BookingId is already defined above
+
+    // Then, do an INSERT INTO bookingdetails query
+    let sql =
+      "INSERT INTO bookingdetails (`TripStart`, `TripEnd`, `Description`, `BasePrice`, `BookingId`) VALUES (?, ?, ?, ?, ?)";
+    let inserts = [TripStart, TripEnd, Description, BasePrice, BookingId];
+    sql = mysql.format(sql, inserts);
+
+    connection.query(sql, (err, result) => {
+      if (err) console.log(err);
+
+      console.log(result);
+      connection.end();
+
+      // TODO Need to insert render of thank you - I think maybe susan is on this
+    });
+  });
 });
 
 app.get("/", (req, res) => {
@@ -314,7 +431,16 @@ app.post("/registerPOST", (req, res) => {
   user_email = email; //for testing
   // create User object
   console.dir(recentSessions);
-  res.render("home");
+  // define registration thank you page variables which includes customer first name
+  const rThanksHeader = {
+    Title: "Success!",
+    Subtitle: "Your registration was successful",
+    CustFirstName: req.body.firstName,
+  };
+  console.log("returning thank you page after register post");
+  console.log(req.body.firstName);
+  // render registration thank you page
+  res.render("registerThanks", rThanksHeader);
 });
 
 // for testing the login
