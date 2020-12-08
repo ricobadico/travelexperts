@@ -102,8 +102,6 @@ app.get("/packages", (req, res) => {
 
 // Orders Page 
 app.post("/orders", (req, res) => {
-  
-
     function formatDate(date) {
       var d = new Date(date),
           month = '' + (d.getMonth() + 1),
@@ -141,8 +139,22 @@ app.post("/orders", (req, res) => {
   //   res.render("packages", packagesInput);
     connection.end();
   });
-
 });
+
+// ordersPOST redirect to database and render thank you page
+// Insert the Register data into the database. All the Register page form needs to do is have "registerPOST" as its action to fire this off
+app.post("/orderPOST", (req, res) => {
+  // define registration thank you page variables which includes customer first name
+  const oThanksHeader = {
+    Title: "Success!",
+    Subtitle: "Your purchase is processing.",
+  }
+  console.log("returning thank you page after orders post");
+  // render registration thank you page
+  res.render("ordersThanks", oThanksHeader);
+});
+
+
 
 
 
