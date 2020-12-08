@@ -12,10 +12,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm">
-                    <h2> Order Number:</h2>
+                    <h2> Package Name:</h2>
                 </div>
                 <div class="col-sm">
-                    <h2>{A12345} </h2>
+                    <h2>{{PkgName}} </h2>
                 </div>
             </div>
             <div class="row">
@@ -23,15 +23,15 @@
                     <h2>Order Date: </h2>
                 </div>
                 <div class="col-sm">
-                    <h2>Date()</h2>
+                    <h2>{{date}}</h2>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm">
-                    <h2>Customer:</h2>
+                    <h2>Price:</h2>
                 </div>
                 <div class="col-sm">
-                    <h2>{John Doe}</h2>
+                    <h2>${{PkgBasePrice}}.00</h2>
                 </div>
             </div>
             <div class="row">
@@ -39,7 +39,7 @@
                     <h2>Description:</h2>
                 </div>
                 <div class="col-sm">
-                    <h2>{product description}</h2>
+                    <h2>{{PkgDesc}}</h2>
                 </div>
             </div>
 

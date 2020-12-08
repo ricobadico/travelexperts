@@ -102,14 +102,46 @@ app.get("/packages", (req, res) => {
 
 // Orders Page 
 app.post("/orders", (req, res) => {
+  
+
+    function formatDate(date) {
+      var d = new Date(date),
+          month = '' + (d.getMonth() + 1),
+          day = '' + d.getDate(),
+          year = d.getFullYear();
+  
+      if (month.length < 2) 
+          month = '0' + month;
+      if (day.length < 2) 
+          day = '0' + day;
+  
+      return [year, month, day].join('-');
+  }
+    date = formatDate (new Date()); 
 
     const ordersInput = { 
     Title: "Your Order",
-    Subtitle: "Finish your planning "
-    
+    Subtitle: "Finish your planning ",
+    date: `${date}`
     }
-  console.log("render orders");
-  res.render("orders", ordersInput);
+    let connection = getConnection();
+  connection.connect();
+  connection.query('SELECT * FROM packages where PackageId = ?', req.body.packageId , (err, result) => {
+    if (err) console.log(err);
+    ordersInput.PkgName = result[0].PkgName
+    ordersInput.PkgBasePrice= result[0].PkgBasePrice
+    ordersInput.PkgDesc = result[0].PkgDesc
+    console.log(ordersInput); 
+    console.log("render orders");
+    res.render("orders", ordersInput);
+  //   packagesInput.Packages = result;
+  
+  //   console.log(packagesInput);
+  //   console.log("render packages");
+  //   res.render("packages", packagesInput);
+    connection.end();
+  });
+
 });
 
 
