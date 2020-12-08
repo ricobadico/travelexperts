@@ -163,3 +163,8 @@ body {
 .row {
   justify-content: center;
 }
+
+/* colourizes input values */
+input[name]{
+  background-color:#B9EEFB;
+}

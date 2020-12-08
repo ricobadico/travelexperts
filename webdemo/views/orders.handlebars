@@ -12,34 +12,34 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm">
-                    <h2> Package Name:</h2>
+                    <h4> Package Name:</h4>
                 </div>
                 <div class="col-sm">
-                    <h2>{{PkgName}} </h2>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm">
-                    <h2>Order Date: </h2>
-                </div>
-                <div class="col-sm">
-                    <h2>{{date}}</h2>
+                    <p>{{PkgName}} </p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm">
-                    <h2>Price:</h2>
+                    <h4>Order Date: </h4>
                 </div>
                 <div class="col-sm">
-                    <h2>${{PkgBasePrice}}.00</h2>
+                    <p>{{date}}</p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm">
-                    <h2>Description:</h2>
+                    <h4>Price:</h4>
                 </div>
                 <div class="col-sm">
-                    <h2>{{PkgDesc}}</h2>
+                    <p>${{PkgBasePrice}}.00</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <h4>Description:</h4>
+                </div>
+                <div class="col-sm">
+                    <p>{{PkgDesc}}</p>
                 </div>
             </div>
 
@@ -47,7 +47,7 @@
 
         <hr />
         <div class="Summary">
-            <h2> A conformation email will be sent to {the registered email} shortly</h2>
+            <h4> A conformation email will be sent to {the registered email} shortly</h4>
             <p> If the information above is correct please proceed to checkout!</p>
         </div>
             <input class="btn btn-info"type="submit"value="Checkout"/>

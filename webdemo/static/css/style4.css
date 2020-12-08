@@ -15,3 +15,8 @@ body {
   overflow: hidden;
   position: relative;
 }
+
+/* colourizes input values */
+input[name]{
+  background-color:#B9EEFB;
+}

@@ -22,7 +22,8 @@ html, body {
 .transparent h1 {
     margin:0; 
     padding-left: 15px; 
-    color: black
+    color: black;
+
 }
 
 .transparent h2 { 
@@ -68,3 +69,8 @@ html, body {
     display: flex;
     
 }
+
+/* colourizes input values */
+input[name]{
+    background-color:#B9EEFB;
+  }

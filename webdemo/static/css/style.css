@@ -311,3 +311,8 @@ a{
 .introwrap{
   opacity: 0;
 }
+
+/* colourizes input values */
+input[name]{
+  background-color:#B9EEFB;
+}
