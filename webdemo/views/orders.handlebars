@@ -2,12 +2,16 @@
 {{>jumbotron}}
 <!-- Navbar -->
 {{>navbar}}
+
+{{!-- Page html and CSS by [Susan and Sheyi] --}}
+{{!-- Hidden Form Data needed by database and express added by [Eric] --}}
 <div class="container">
     <!--Elements within transparent box -->
     <div class="orderBox">
+        {{!-- TODO: With new form stuff added, need validation. Better styling might be needed too. Lastly, need to check if logged in to vary render --}}
         <form method="POST" action="orderPOST" class="needs-validation" novalidate> 
         
-        <h1><i> Thank You For Your Order</i> </h1>
+        <h1><i>Please Confirm Your Order</i> </h1>
         <hr />
         <div class="container">
             <div class="row">
@@ -16,6 +20,18 @@
                 </div>
                 <div class="col-sm">
                     <h2>{{PkgName}} </h2>
+                    {{!-- Each inserted value has a hidden form field that passes the data along in the form submit. --}}
+                    {{!-- This saves us from needing to repeat database SELECT calls later on in app.js --}}
+                    <input type="hidden" name="PkgName" value="{{PkgName}}"/> 
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <h2>Description:</h2>
+                </div>
+                <div class="col-sm">
+                    <h2>{{PkgDesc}}</h2>
+                    <input type="hidden" name="PkgDesc" value="{{PkgDesc}}"/> 
                 </div>
             </div>
             <div class="row">
@@ -31,27 +47,134 @@
                     <h2>Price:</h2>
                 </div>
                 <div class="col-sm">
-                    <h2>${{PkgBasePrice}}.00</h2>
+                    <h2 id="packageSingleCost">${{PkgBasePrice}}.00</h2>
                 </div>
             </div>
+            {{!-- Extra functionality to allow for buying multiple tickets [Eric] --}}
+            {{!-- Adding a row to choose quantity of travellers --}}
             <div class="row">
                 <div class="col-sm">
-                    <h2>Description:</h2>
+                    <h2>Number of travellers:</h2>
                 </div>
                 <div class="col-sm">
-                    <h2>{{PkgDesc}}</h2>
+                    {{!-- This field has a function that updates total cost every time the user changes its value --}}
+                    <input class="order-form-input" type="number" id="orderquantity" name="TravelerCount" onchange=updateTotal()>
                 </div>
             </div>
-
+            {{!-- Adding a row to show cost --}}
+            <div class="row">
+                <div class="col-sm">
+                    <h2><b>Total Cost:</b></h2>
+                </div>
+                <div class="col-sm">
+                    <h2 id="packageTotalCost"></h2>
+                    {{!-- In addition to showing the cost above with currency format, hide actual numeric cost in form value. --}}
+                    <input type="hidden" id="totalCostFormField" name="OrderTotalCost"/>
+                </div>
+            </div>
         </div>
 
         <hr />
-        <div class="Summary">
+        {{!-- <div class="Summary">
             <h2> A conformation email will be sent to {the registered email} shortly</h2>
             <p> If the information above is correct please proceed to checkout!</p>
-        </div>
-            <input class="btn btn-info"type="submit"value="Checkout"/>
+        </div> --}}
+
+        {{!-- Adding a section for contact info that only appears if not logged in [Eric]--}}
+        {{#if loggedIn}}
+            {{!-- CustomerID stored here if loggedin. TODO: pull value from session rather than hardcode1 --}}
+            <input type="hidden" id="CustomerId" name="CustomerId" value="1">
+        
+        {{else}}
+
+            <h2>Please log in or provide your contact information below:</h2>
+            <div class="form-row ">
+	    			<div class="col-sm-6 ">
+						<label for="firstName">First Name:</label><br/>
+						<input class="form-control" type="text" name="firstName" id="firstName" required="required" placeholder="First Name">
+						<div class="invalid-feedback">Please enter your first name</div><br/>
+					</div>	
+					<div class="col-sm-6 ">
+						<label for="lastName">Last Name:</label><br/>
+						<input class="form-control" type="text" name="lastName" id="lastName" required="required" placeholder="Last Name">
+						<div class="invalid-feedback">Please enter your last name</div>
+					</div>
+				</div>
+                <div class="form-row">	
+	    			<div class="col-sm-6">
+						<label for="email">Email:</label><br/>
+						<input class="form-control" type="text" name="email" id="email" required="required" placeholder="Email" onchange="checkEmail(this)">
+						<div class="invalid-feedback">Please enter your email</div>
+						<br/>
+					</div>	
+					<div class="col-sm-6">
+						<label for="email">Phone Number:</label><br/>
+						<input class="form-control" type="tel" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)">
+						<div class="invalid-feedback">Please enter your phone number</div>
+						<br/>
+						<script src="js/phoneFormatter.js"></script>
+					</div>
+				</div>	
+				<div class="form-row ">
+	    			<div class="col-sm-6 mb-3">
+						<label for="address">Address:</label>
+						<input class="form-control" type="text" name="address" id="address" required="required" placeholder="Address">
+						<div class="invalid-feedback">Please enter your address</div><br/>	
+					</div>
+					<div class="col-sm-6 mb-3">
+						<label for="city">City:</label><br/>
+						<input class="form-control" type="text" name="city" id="city" required="required" placeholder="City">
+						<div class="invalid-feedback">Please enter your city</div>
+					</div>
+					<div class="col-sm-6 mb-3">
+						<label for="prov">Province</label>
+					    <select class="form-control" name="prov" id="prov" required="required">
+					      <option>AB</option>
+					      <option>BC</option>
+					      <option>MB</option>
+					      <option>NB</option>
+					      <option>NL</option>
+					      <option>NS</option>
+					      <option>NT</option>
+					      <option>NU</option>
+					      <option>ON</option>
+					      <option>PE</option>
+					      <option>QC</option>
+					      <option>SK</option>
+					      <option>YT</option>
+					    </select>
+					</div>
+					<div class="col-sm-6 mb-3">
+						<label for="pCode">Postal Code:</label><br/>
+						<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
+						<div class="invalid-feedback">Please enter your postal code</div>
+					</div>		
+				</div>	
+        {{/if}}
+
+        {{!-- Extra hidden values passed along the from the previous page to the next server function --}}
+        <input type="hidden" name="PackageId" value="{{PackageId}}"/>
+        <input type="hidden" name="PkgStartDate" value="{{PkgStartDate}}"/>
+        <input type="hidden" name="PkgEndDate" value="{{PkgEndDate}}"/>
+
+        <input class="btn btn-info"type="submit"value="Checkout"/>
         </form>
     </div>
 </div>
-</div>
+
+
+<script>
+    // Updates total cost field when adding quantity
+
+    const updateTotal = () => {
+        // Grab relevant fields
+        let packageSingleCost = {{PkgBasePrice}};
+        let quantity = document.getElementById("orderquantity");
+        let packageTotalCost = document.getElementById("packageTotalCost");
+
+        // Add calculated value to field in currency format
+        packageTotalCost.innerHTML = `$${quantity.value * packageSingleCost}.00`;
+        // Add to form data in numeric format
+        document.getElementById("totalCostFormField").value = quantity.value * packageSingleCost;
+    }
+</script>

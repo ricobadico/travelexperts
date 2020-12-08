@@ -68,3 +68,13 @@ html, body {
     display: flex;
     
 }
+
+.order-form-input {
+    font-size: 2rem;
+    border-radius: 10px;
+    width:50px;
+    border:none;
+    box-shadow: 1px 1px 3px grey;
+    padding-left: 1rem;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+}
