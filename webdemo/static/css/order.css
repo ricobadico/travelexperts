@@ -76,7 +76,8 @@ input[name]{
     background-color:#B9EEFB;
   }
 
-  footer {
+footer {
+    position: absolute;
     width:100%;
     bottom: 0px;
     height: 36px;
@@ -86,7 +87,7 @@ input[name]{
     align-items: flex-end;
     box-shadow: 0 -5px 10px rgba(90, 90, 90, .6);
     margin-top: 30px;
-  }
+}
 .order-form-input {
     font-size: 1em;
     border-radius: 10px;
