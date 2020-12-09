@@ -13,6 +13,7 @@ const uuid = require("uuid");
 const bcrypt = require("bcrypt");
 const { connected } = require("process");
 const saltRounds = 10;
+const { formatDate } = require("./static/js/formatDate.js");
 
 const RedisStore = require("connect-redis")(session);
 const redisClient = redis.createClient();
@@ -115,12 +116,18 @@ app.get("/packages", (req, res) => {
   connection.connect();
   // TODO: Need to change this to only find packages in the future. This means we need to change dates in the db
   connection.query("SELECT * FROM packages", (err, result) => {
+
     if (err) console.log(err);
 
     packagesInput.loggedIn = loggedIn;
     packagesInput.navbarAuth = navbarAuth;
     packagesInput.navbarPublic = navbarPublic;
     packagesInput.Packages = result;
+
+    for(let currentPackageIndex in packagesInput.Packages){
+      packagesInput.Packages[currentPackageIndex].PkgStartDate = formatDate(packagesInput.Packages[currentPackageIndex].PkgStartDate);
+      packagesInput.Packages[currentPackageIndex].PkgEndDate = formatDate(packagesInput.Packages[currentPackageIndex].PkgEndDate);
+    }
 
     console.log(packagesInput);
     console.log("render packages");
