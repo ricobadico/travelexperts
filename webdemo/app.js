@@ -110,6 +110,9 @@ app.get("/register", (req, res) => {
     Subtitle:
       "Register for an account to stay up to date on our hottest deals.",
   };
+  registerInputs.loggedIn = loggedIn;
+  registerInputs.navbarAuth = navbarAuth;
+  registerInputs.navbarPublic = navbarPublic;
 
   console.log("render register");
   res.render("register", registerInputs);
@@ -126,6 +129,9 @@ app.get("/packages", (req, res) => {
   connection.query("SELECT * FROM packages", (err, result) => {
     if (err) console.log(err);
 
+    packagesInput.loggedIn = loggedIn;
+    packagesInput.navbarAuth = navbarAuth;
+    packagesInput.navbarPublic = navbarPublic;
     packagesInput.Packages = result;
 
     console.log(packagesInput);
@@ -169,6 +175,10 @@ app.post("/orders", (req, res) => {
       ordersInput.PkgEndDate = result[0].PkgEndDate;
       console.log(ordersInput);
       console.log("render orders");
+
+      ordersInput.loggedIn = loggedIn;
+      ordersInput.navbarAuth = navbarAuth;
+      ordersInput.navbarPublic = navbarPublic;
       res.render("orders", ordersInput);
       //   packagesInput.Packages = result;
 
@@ -195,6 +205,10 @@ app.post("/orderPOST", (req, res) => {
       ordersInput.PkgDesc = result[0].PkgDesc;
       console.log(ordersInput);
       console.log("render orders");
+
+      ordersInput.loggedIn = loggedIn;
+      ordersInput.navbarAuth = navbarAuth;
+      ordersInput.navbarPublic = navbarPublic;
       res.render("orders", ordersInput);
       connection.end();
     }
@@ -209,6 +223,9 @@ app.post("/orderPOST", (req, res) => {
     Subtitle: "Your purchase is processing",
   };
   console.log("returning thank you page after orders post");
+  oThanksHeader.loggedIn = loggedIn;
+  oThanksHeader.navbarAuth = navbarAuth;
+  oThanksHeader.navbarPublic = navbarPublic;
   // render registration thank you page
   res.render("ordersThanks", oThanksHeader);
 
@@ -280,11 +297,17 @@ app.get("/", (req, res) => {
   //console.log(req.query);
   console.log("render home");
   // the home page is injected with some values that determine whether the intro happens, and what splash image to show
-  res.render("home", {
+  homeInputs = {
     skipIntro: req.query.skipIntro,
     introSplashNumber: `${randomNum(6)}`,
-  });
+  };
+
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
 });
+
 //for logout
 app.post("/", (req, res) => {
   if (recentSessions) {
@@ -294,10 +317,15 @@ app.post("/", (req, res) => {
   //console.log(req.query);
   console.log("render home");
   // the home page is injected with some values that determine whether the intro happens, and what splash image to show
-  res.render("home", {
+  homeInputs = {
     skipIntro: req.query.skipIntro,
     introSplashNumber: `${randomNum(6)}`,
-  });
+  };
+
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
 });
 
 app.post("/login", (req, res, next) => {
@@ -357,7 +385,17 @@ app.post("/login", (req, res, next) => {
   res.setHeader("Content-Type", "text/html");
   res.write("<p>Post Query OK</p>");
   res.write(`<p>${message}</p>`);
-  res.end();
+  //res.end();
+
+  homeInputs = {
+    skipIntro: req.query.skipIntro,
+    introSplashNumber: `${randomNum(6)}`,
+  };
+
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
 });
 
 app.get("/error", (req, res) => {
@@ -513,6 +551,10 @@ app.post("/registerPOST", (req, res) => {
   console.log("returning thank you page after register post");
   console.log(req.body.firstName);
   // render registration thank you page
+
+  rThanksHeader.loggedIn = loggedIn;
+  rThanksHeader.navbarAuth = navbarAuth;
+  rThanksHeader.navbarPublic = navbarPublic;
   res.render("registerThanks", rThanksHeader);
 });
 

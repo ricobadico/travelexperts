@@ -4,7 +4,9 @@
     
     {{> jumbotron}}
 	
-	{{> navbar}}
+	{{#if navbarAuth}} {{> navbarLoggedIn}} {{/if}}
+
+	{{#if navbarPublic}} {{> navbar}} {{/if}}
 
     <div class="packages-outer-grid">
 
