@@ -202,6 +202,7 @@ app.post("/orderPOST", (req, res) => {
   let inserts = [BookingDate, TravelerCount, CustomerId, PackageId];
   // This next line updates the sql to insert those placeholders in a tidy, attack-secure way (don't worry about it too much)
   sql = mysql.format(sql, inserts);
+  console.log(sql);
   // Finally the query
   connection.query(sql, (err, result) => {
     if (err) console.log(err);

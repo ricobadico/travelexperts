@@ -1,4 +1,4 @@
-body {
+html, body {​​
     height: 100%;
     width: 100%;
     margin: 0; 
@@ -6,7 +6,7 @@ body {
     background-repeat: no-repeat; 
     background-size: cover;
     background-attachment: fixed;
-}
+}​​
 
 .transparent { 
    
@@ -77,9 +77,6 @@ input[name]{
   }
 
 footer {
-    position: absolute;
-    width:100%;
-    bottom: 0px;
     height: 36px;
     background-color: rgba(247,245,236,.9);
     display:flex;

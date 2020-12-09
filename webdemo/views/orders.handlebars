@@ -77,7 +77,7 @@
         {{!-- Adding a section for contact info that only appears if not logged in [Eric]--}}
         {{#if loggedIn}}
             {{!-- CustomerID stored here if loggedin. TODO: pull value from session rather than hardcode1 --}}
-			<input type="hidden" id="{{#if loggedIn}}{{uid}}{{else}}''{{/if}}" name="CustomerId" value="1">
+			<input type="hidden" id="{{uid}}" name="CustomerId" value="{{uid}}">
         
         {{else}}
 

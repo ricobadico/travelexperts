@@ -160,25 +160,6 @@ body {
   display: inline-block;
 }
 
-.our-team.our-team.agency-container .peek-up {
-  /* width: 100%;
-  padding: 0;
-  margin: 0;
-  background-color: #B9EEFB;
-  position: absolute;
-  bottom: -100px;
-  left: 0;
-  transition: all 0.5s ease 0s; */
-}
-
-.our-team.our-team.agency-container:hover .peek-up {
-  bottom: 0;
-}
-
-.our-team.our-team.agency-container .peek-up li {
-  display: inline-block;
-}
-
 .row {
   justify-content: center;
 }
