@@ -69,29 +69,17 @@ app.use(
 
 app.use("/", express.static(path.join(__dirname, "static")));
 
+// Manages the state change for Logged it and out;
 app.use((req, res, next) => {
   if (req.session.uid) {
-    console.log("Has id");
-    console.log(req.session.uid);
     loggedIn = true;
     req.session.login = true;
   } else {
-    console.log("no id");
-    console.log(req.session.uid);
     loggedIn = false;
     req.session.login = false;
     req.session.uid = null;
   }
-  (() => {
-    console.log("do i run");
-    if (loggedIn) {
-      navbarAuth = true;
-      navbarPublic = false;
-    } else {
-      navbarPublic = true;
-      navbarAuth = false;
-    }
-  })();
+  console.dir(req.session);
   next();
 });
 
@@ -173,6 +161,7 @@ app.post("/orders", (req, res) => {
       ordersInput.PkgDesc = result[0].PkgDesc;
       ordersInput.PkgStartDate = result[0].PkgStartDate;
       ordersInput.PkgEndDate = result[0].PkgEndDate;
+      ordersInput.PackageId = req.body.packageId;
       console.log(ordersInput);
       console.log("render orders");
 
@@ -195,44 +184,10 @@ app.post("/orders", (req, res) => {
   );
 });
 
-// Orders Page Submit --> submits order confirmation, updating relevant db tables, go to thank you page [Eric]
-app.post("/orderPOST", (req, res) => {
-  // First, we need to open a database connection:
-  let connection = getConnection();
-  connection.connect();
-  connection.query(
-    "SELECT * FROM packages where PackageId = ?",
-    req.body.packageId,
-    (err, result) => {
-      if (err) console.log(err);
-      ordersInput.PkgName = result[0].PkgName;
-      ordersInput.PkgBasePrice = result[0].PkgBasePrice;
-      ordersInput.PkgDesc = result[0].PkgDesc;
-      console.log(ordersInput);
-      console.log("render orders");
-
-      ordersInput.loggedIn = loggedIn;
-      ordersInput.navbarAuth = navbarAuth;
-      ordersInput.navbarPublic = navbarPublic;
-      res.render("orders", ordersInput);
-      connection.end();
-    }
-  );
-});
-
 // ordersPOST renders thank you page after posting to database
 app.post("/orderPOST", (req, res) => {
-  // define orders thank you page variables
-  const oThanksHeader = {
-    Title: "Success!",
-    Subtitle: "Your purchase is processing",
-  };
-  console.log("returning thank you page after orders post");
-  oThanksHeader.loggedIn = loggedIn;
-  oThanksHeader.navbarAuth = navbarAuth;
-  oThanksHeader.navbarPublic = navbarPublic;
-  // render registration thank you page
-  res.render("ordersThanks", oThanksHeader);
+  let connection = getConnection();
+  connection.connect();
 
   //STEP 1 -----
   // TODO: Get all data needed to fill in a row of the bookings table in db
@@ -284,6 +239,17 @@ app.post("/orderPOST", (req, res) => {
       connection.end();
 
       // TODO Need to insert render of thank you - I think maybe susan is on this
+      // define orders thank you page variables
+      const oThanksHeader = {
+        Title: "Success!",
+        Subtitle: "Your purchase is processing",
+      };
+      console.log("returning thank you page after orders post");
+      oThanksHeader.loggedIn = loggedIn;
+      oThanksHeader.navbarAuth = navbarAuth;
+      oThanksHeader.navbarPublic = navbarPublic;
+      // render registration thank you page
+      res.render("ordersThanks", oThanksHeader);
     });
   });
 });
@@ -300,6 +266,7 @@ app.post("/logout", (req, res, next) => {
     introSplashNumber: `${randomNum(6)}`,
   };
 
+  homeInputs.skipIntro = true;
   homeInputs.loggedIn = loggedIn;
   homeInputs.navbarAuth = navbarAuth;
   homeInputs.navbarPublic = navbarPublic;
@@ -342,73 +309,50 @@ app.post("/", (req, res) => {
 });
 
 app.post("/login", (req, res, next) => {
-  session.Des;
   let connection = getConnection();
   connection.connect();
   let dbResult;
-  let resultId;
+  let results;
 
-  let message = "";
   let sql = "SELECT * FROM ?? WHERE ?? = ?";
   let inserts = ["web_credentials", "Username", req.body.username];
   sql = mysql.format(sql, inserts);
   connection.query(sql, async (err, results) => {
     if (err) {
       console.error(err);
-      await connection.end();
-      // should redirect to error page
+      connection.end();
+      // do some redirect ********************TODO************
     } else {
-      console.log(results);
+      //console.log(results);
       dbResult = results;
-      console.log(req.body.password);
+      //console.log(req.body.password);
       await bcrypt.compare(
         req.body.password,
         results[0].Hash,
         async (err, result) => {
           if (err) {
             console.error(err);
-            // do some redirect
             connection.end();
           } else if (result) {
             //true
-            message = "passwords match";
-            console.log(message);
+            console.log("passwords match");
           } else {
             // false
-            console.log(result);
-            message = "password do not match";
-            console.log(message);
+            console.log("password do not match");
             //do some redirect
+            //***************************TODO********************//
           }
         }
       );
-      console.log("in login conn dbResult");
-      console.dir(dbResult);
-      console.log(`id: ${dbResult[0].CustomerId}`);
       console.dir(req.session);
       if (dbResult) {
         req.session.uid = dbResult[0].CustomerId;
-        await req.session.save();
+        req.session.save();
       }
-      await connection.end();
+      connection.end();
     }
+    res.redirect("/?skipIntro=true");
   });
-  // so the problem is that the code in queries excutes after below and after the req.end()
-  //req.session.email = "testString2";
-  //res.setHeader("Content-Type", "text/html");
-  //res.write("<p>Post Query OK</p>");
-  //res.write(`<p>${message}</p>`);
-  //res.end();
-
-  homeInputs = {
-    skipIntro: true,
-    introSplashNumber: `${randomNum(6)}`,
-  };
-
-  homeInputs.loggedIn = loggedIn;
-  homeInputs.navbarAuth = navbarAuth;
-  homeInputs.navbarPublic = navbarPublic;
-  res.render("home", homeInputs);
 });
 
 app.get("/error", (req, res) => {

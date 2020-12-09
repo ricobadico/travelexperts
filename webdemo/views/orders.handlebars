@@ -15,10 +15,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm">
-                    <h4> Package Name:</h4>
+                    <h2> Package Name:</h2>
                 </div>
                 <div class="col-sm">
-                    <p>{{PkgName}} </p>
+                    <h2>{{PkgName}} </h2>
                     {{!-- Each inserted value has a hidden form field that passes the data along in the form submit. --}}
                     {{!-- This saves us from needing to repeat database SELECT calls later on in app.js --}}
                     <input type="hidden" name="PkgName" value="{{PkgName}}"/> 
@@ -35,38 +35,45 @@
             </div>
             <div class="row">
                 <div class="col-sm">
-                    <h4>Order Date: </h4>
+                    <h2>Order Date: </h2>
                 </div>
                 <div class="col-sm">
-                    <p>{{date}}</p>
+                    <h2>{{date}}</h2>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm">
-                    <h4>Price:</h4>
+                    <h2>Price:</h2>
                 </div>
                 <div class="col-sm">
-                    <p>${{PkgBasePrice}}.00</p>
+                    <h2 id="packageSingleCost">${{PkgBasePrice}}.00</h2>
                 </div>
             </div>
             {{!-- Extra functionality to allow for buying multiple tickets [Eric] --}}
             {{!-- Adding a row to choose quantity of travellers --}}
             <div class="row">
                 <div class="col-sm">
-                    <h4>Description:</h4>
+                    <h2>Number of travellers:</h2>
                 </div>
                 <div class="col-sm">
-                    <p>{{PkgDesc}}</p>
+                    {{!-- This field has a function that updates total cost every time the user changes its value --}}
+                    <input class="order-form-input" type="number" value="1" id="orderquantity" name="TravelerCount" onchange=updateTotal()>
+                </div>
+            </div>
+            {{!-- Adding a row to show cost --}}
+            <div class="row">
+                <div class="col-sm">
+                    <h2><b>Total Cost:</b></h2>
+                </div>
+                <div class="col-sm">
+                    <h2 id="packageTotalCost">${{PkgBasePrice}}.00</h2>
+                    {{!-- In addition to showing the cost above with currency format, hide actual numeric cost in form value. --}}
+                    <input type="hidden" id="totalCostFormField" name="OrderTotalCost" value ={{PkgBasePrice}}/>
                 </div>
             </div>
         </div>
 
         <hr />
-        <div class="Summary">
-            <h4> A confirmation email will be sent to {the registered email} shortly</h4>
-
-            <p> If the information above is correct please proceed to checkout!</p>
-        </div> --}}
 
         {{!-- Adding a section for contact info that only appears if not logged in [Eric]--}}
         {{#if loggedIn}}
