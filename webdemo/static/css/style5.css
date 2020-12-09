@@ -3,6 +3,7 @@ body {
   background-image: url("/media/sanLorenzo.jpg");
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
 }
 
 .thankYou {
@@ -22,6 +23,9 @@ input[name]{
 }
 
 footer {
+  position: absolute;
+  width:100%;
+  bottom: 0px;
   height: 36px;
   background-color: rgba(247,245,236,.9);
   display:flex;
