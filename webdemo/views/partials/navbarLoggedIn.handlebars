@@ -22,12 +22,15 @@
 	  <li class="nav-item">
 		<a class="nav-link" href="packages">Travel Packages</a>
 	  </li>
-
+      <li class="nav-item">
+		<a id="nav-option" class="nav-link" style="visibility: hidden" {{#if loggedIn}}disabled{{/if}}" href="">Some Link</a>
+	  </li>
+	</ul>
 	</ul>
   </div>
 
   <form name=logout-form class="form-inline" action="/logout" method="POST">
-    <input class="form-control mr-sm-2" value="theUserId" name=username required type="text" placeholder="Username" aria-label="Username">
+    <input class="form-control mr-sm-2" value="" name=logout required type="hidden">
     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
   </form>
 </nav>

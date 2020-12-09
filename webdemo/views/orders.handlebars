@@ -1,8 +1,7 @@
 <link rel="stylesheet" href='/css/order.css'>
 {{>jumbotron}}
 <!-- Navbar -->
-{{>navbar}}
-
+{{#if loggedIn}} {{> navbarLoggedIn}} {{else}} {{> navbar}}{{/if}}
 {{!-- Page html and CSS by [Susan and Sheyi] --}}
 {{!-- Hidden Form Data needed by database and express added by [Eric] --}}
 <div class="container">
@@ -72,7 +71,7 @@
         {{!-- Adding a section for contact info that only appears if not logged in [Eric]--}}
         {{#if loggedIn}}
             {{!-- CustomerID stored here if loggedin. TODO: pull value from session rather than hardcode1 --}}
-            <input type="hidden" id="CustomerId" name="CustomerId" value="1">
+			<input type="hidden" id="{{#if loggedIn}}{{uid}}{{else}}''{{/if}}" name="CustomerId" value="1">
         
         {{else}}
 

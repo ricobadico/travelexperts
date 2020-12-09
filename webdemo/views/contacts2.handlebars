@@ -3,7 +3,8 @@
 	
 	{{> jumbotron}}
 
-	{{> navbar}}
+	{{#if loggedIn}} {{> navbarLoggedIn}} {{else}} {{> navbar}}{{/if}}
+    
 
 
 	<br/><br/>
