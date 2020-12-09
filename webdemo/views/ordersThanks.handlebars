@@ -2,9 +2,7 @@
 	
 {{> jumbotron}}
 
-{{#if navbarAuth}} {{> navbarLoggedIn}} {{/if}}
-
-{{#if navbarPublic}} {{> navbar}} {{/if}}
+{{#if loggedIn}} {{> navbarLoggedIn}} {{else}} {{> navbar}}{{/if}}
 
 <div class="container">
 	<div class="thankYou">	

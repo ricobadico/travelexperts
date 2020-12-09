@@ -179,6 +179,11 @@ app.post("/orders", (req, res) => {
       ordersInput.loggedIn = loggedIn;
       ordersInput.navbarAuth = navbarAuth;
       ordersInput.navbarPublic = navbarPublic;
+      if (req.session.uid) {
+        ordersInput.uid = req.session.uid;
+      } else {
+        ordersInput.uid = "";
+      }
       res.render("orders", ordersInput);
       //   packagesInput.Packages = result;
 

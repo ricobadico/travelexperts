@@ -24,9 +24,8 @@
 	  </div>
 	</div>
 
-	{{#if navbarAuth}} {{> navbarLoggedIn}} {{/if}}
     
-	{{#if navbarPublic}} {{> navbar}} {{/if}}
+	{{#if loggedIn}} {{> navbarLoggedIn}} {{else}} {{> navbar}}{{/if}}
 
 	<!-- Blurb [Eric] -->
 	<section class="content intro"> 
