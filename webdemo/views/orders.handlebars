@@ -1,8 +1,7 @@
 <link rel="stylesheet" href='/css/order.css'>
 {{>jumbotron}}
 <!-- Navbar -->
-{{>navbar}}
-
+{{#if loggedIn}} {{> navbarLoggedIn}} {{else}} {{> navbar}}{{/if}}
 {{!-- Page html and CSS by [Susan and Sheyi] --}}
 {{!-- Hidden Form Data needed by database and express added by [Eric] --}}
 <div class="container">
@@ -47,31 +46,38 @@
                     <h4>Price:</h4>
                 </div>
                 <div class="col-sm">
-                    <p>${{PkgBasePrice}}.00</p>
+                    <p id="packageSingleCost">${{PkgBasePrice}}.00</p>
                 </div>
             </div>
             {{!-- Extra functionality to allow for buying multiple tickets [Eric] --}}
             {{!-- Adding a row to choose quantity of travellers --}}
             <div class="row">
                 <div class="col-sm">
-                    <h4>Description:</h4>
+                    <h4>Number of travellers:</h4>
                 </div>
                 <div class="col-sm">
-                    <p>{{PkgDesc}}</p>
+                    {{!-- This field has a function that updates total cost every time the user changes its value --}}
+                    <input class="order-form-input" min="1" type="number" value="1" id="orderquantity" name="TravelerCount" onchange=updateTotal()>
+                </div>
+            </div>
+            {{!-- Adding a row to show cost --}}
+            <div class="row">
+                <div class="col-sm">
+                    <h4><b>Total Cost:</b></h4>
+                </div>
+                <div class="col-sm">
+                    <p id="packageTotalCost">${{PkgBasePrice}}.00</p>
+                    {{!-- In addition to showing the cost above with currency format, hide actual numeric cost in form value. --}}
+                    <input type="hidden" id="totalCostFormField" name="OrderTotalCost" value ={{PkgBasePrice}}/>
                 </div>
             </div>
         </div>
         <hr />
-        <div class="Summary">
-            <h4> A confirmation email will be sent to your shortly</h4>
-
-            <p> If the information above is correct please proceed to checkout!</p>
-        </div>
 
         {{!-- Adding a section for contact info that only appears if not logged in [Eric]--}}
         {{#if loggedIn}}
             {{!-- CustomerID stored here if loggedin. TODO: pull value from session rather than hardcode1 --}}
-            <input type="hidden" id="CustomerId" name="CustomerId" value="1">
+			<input type="hidden" id="{{#if loggedIn}}{{uid}}{{else}}''{{/if}}" name="CustomerId" value="1">
         
         {{else}}
 
