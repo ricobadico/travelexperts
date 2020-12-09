@@ -278,6 +278,7 @@ app.post("/logout", (req, res, next) => {
     introSplashNumber: `${randomNum(6)}`,
   };
 
+  homeInputs.skipIntro = true;
   homeInputs.loggedIn = loggedIn;
   homeInputs.navbarAuth = navbarAuth;
   homeInputs.navbarPublic = navbarPublic;
@@ -369,6 +370,7 @@ app.post("/login", (req, res, next) => {
         await req.session.save();
       }
       await connection.end();
+      res.redirect("/?skipIntro=true");
     }
   });
   // so the problem is that the code in queries excutes after below and after the req.end()
