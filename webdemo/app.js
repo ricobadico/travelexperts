@@ -190,69 +190,95 @@ app.post("/orders", (req, res) => {
 app.post("/orderPOST", (req, res) => {
   let connection = getConnection();
   connection.connect();
+  // if (req.body.CustomerId){
 
-  //STEP 1 -----
-  // TODO: Get all data needed to fill in a row of the bookings table in db
-  // That includes BookingDate, BookingNo(?), TravelerCount, CustomerID, TripTypeId(?), PackageId
-  // Some of those values we aren't getting from anywhere (marked with a ?), let's leave them null
-  // Luckily, the rest we can get from req.body from the previous page
-  let BookingDate = new Date();
-  let TravelerCount = req.body.TravelerCount;
-  let CustomerId = req.body.CustomerId;
-  let PackageId = req.body.packageId;
+  // }
+  console.log(req.body);
+  let CustFN = req.body.firstName; 
+  let CustLN = req.body.lastName; 
+  let CustEM = req.body.email; 
+  let CustPH = req.body.pNumber; 
+  let CustAD = req.body.address; 
+  let CustCY = req.body.city; 
+  let CustPV = req.body.prov; 
+  let CustPC = req.body.pCode; 
+  let sql1 = "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  let inserts1 = [CustFN, CustLN, CustEM, CustPH, CustAD, CustCY, CustPV, CustPC];
+  sql1 = mysql.format(sql1, inserts1);
+  console.log(sql1);
 
-  // Then, do an INSERT INTO bookings query
-  // You need an SQL query first
-  let sql =
-    "INSERT INTO bookings (`BookingDate`, `TravelerCount`, `CustomerID`, `PackageId`) VALUES (?, ?, ?, ?)";
-  // Next, create an array of values to insert in the placeholders (the values getting inserted into the database in their respective columns)
-  let inserts = [BookingDate, TravelerCount, CustomerId, PackageId];
-  // This next line updates the sql to insert those placeholders in a tidy, attack-secure way (don't worry about it too much)
-  sql = mysql.format(sql, inserts);
-  console.log(sql);
-  // Finally the query
-  connection.query(sql, (err, result) => {
+  connection.query(sql1, (err, result)=>{
     if (err) console.log(err);
+    console.log("sql1 result:");
+    console.log(result.insertId);
+    //STEP 1 -----
+    // TODO: Get all data needed to fill in a row of the bookings table in db
+    // That includes BookingDate, BookingNo(?), TravelerCount, CustomerID, TripTypeId(?), PackageId
+    // Some of those values we aren't getting from anywhere (marked with a ?), let's leave them null
+    // Luckily, the rest we can get from req.body from the previous page
+    let BookingDate = new Date();
+    let TravelerCount = req.body.TravelerCount;
+    let CustomerId;
+    if (req.body.CustomerId){
+      CustomerId = req.body.CustomerId;
+    } else {
+      CustomerId = result.insertId;
+    }
+    let PackageId = req.body.PackageId;
 
-    //In the event of a successful insert, we can grab the newly inserted row's id out of the result object. We'll need it in the next insert query
-    let BookingId = result.insertId;
-
-    //STEP 2 -----------
-    // TODO Get all data needed to fill in a row of bookingdetails table in db
-    // That includes ItineraryNo(?), TripStart, TripEnd, Description, Destination(?), BasePrice, AgencyCommission(?), BookingId, RegionId(?), ClassId(?), FeeId(?), ProductSupplierId(?)
-    // Note we need BookingId which means we have to insert into the bookings table above first, then grab the id from the result
-    // The form will be fairly similar to the step 1 above. Note some values come from the package table (they aren't 3NF!) and we could do another query to get them...
-    // However, what we've done instead is send that info as hidden form data from /packages route to /orders to /packagesPOST, pulling them out of req.body
-    let TripStart = req.body.PkgStartDate;
-    let TripEnd = req.body.PkgEndDate;
-    let Description = req.body.PkgDesc;
-    let BasePrice = req.body.OrderTotalCost;
-    //Note BookingId is already defined above
-
-    // Then, do an INSERT INTO bookingdetails query
+    // Then, do an INSERT INTO bookings query
+    // You need an SQL query first
     let sql =
-      "INSERT INTO bookingdetails (`TripStart`, `TripEnd`, `Description`, `BasePrice`, `BookingId`) VALUES (?, ?, ?, ?, ?)";
-    let inserts = [TripStart, TripEnd, Description, BasePrice, BookingId];
+      "INSERT INTO bookings (`BookingDate`, `TravelerCount`, `CustomerID`, `PackageId`) VALUES (?, ?, ?, ?)";
+    // Next, create an array of values to insert in the placeholders (the values getting inserted into the database in their respective columns)
+    let inserts = [BookingDate, TravelerCount, CustomerId, PackageId];
+    // This next line updates the sql to insert those placeholders in a tidy, attack-secure way (don't worry about it too much)
     sql = mysql.format(sql, inserts);
-
+    console.log(sql);
+    // Finally the query
     connection.query(sql, (err, result) => {
       if (err) console.log(err);
 
-      console.log(result);
-      connection.end();
+      //In the event of a successful insert, we can grab the newly inserted row's id out of the result object. We'll need it in the next insert query
+      let BookingId = result.insertId;
 
-      // TODO Need to insert render of thank you - I think maybe susan is on this
-      // define orders thank you page variables
-      const oThanksHeader = {
-        Title: "Success!",
-        Subtitle: "Your purchase is processing",
-      };
-      console.log("returning thank you page after orders post");
-      oThanksHeader.loggedIn = loggedIn;
-      oThanksHeader.navbarAuth = navbarAuth;
-      oThanksHeader.navbarPublic = navbarPublic;
-      // render registration thank you page
-      res.render("ordersThanks", oThanksHeader);
+      //STEP 2 -----------
+      // TODO Get all data needed to fill in a row of bookingdetails table in db
+      // That includes ItineraryNo(?), TripStart, TripEnd, Description, Destination(?), BasePrice, AgencyCommission(?), BookingId, RegionId(?), ClassId(?), FeeId(?), ProductSupplierId(?)
+      // Note we need BookingId which means we have to insert into the bookings table above first, then grab the id from the result
+      // The form will be fairly similar to the step 1 above. Note some values come from the package table (they aren't 3NF!) and we could do another query to get them...
+      // However, what we've done instead is send that info as hidden form data from /packages route to /orders to /packagesPOST, pulling them out of req.body
+      let TripStart = req.body.PkgStartDate;
+      let TripEnd = req.body.PkgEndDate;
+      let Description = req.body.PkgDesc;
+      let BasePrice = req.body.OrderTotalCost;
+      //Note BookingId is already defined above
+
+      // Then, do an INSERT INTO bookingdetails query
+      let sql =
+        "INSERT INTO bookingdetails (`TripStart`, `TripEnd`, `Description`, `BasePrice`, `BookingId`) VALUES (?, ?, ?, ?, ?)";
+      let inserts = [TripStart, TripEnd, Description, BasePrice, BookingId];
+      sql = mysql.format(sql, inserts);
+
+      connection.query(sql, (err, result) => {
+        if (err) console.log(err);
+
+        console.log(result);
+        connection.end();
+
+        // TODO Need to insert render of thank you - I think maybe susan is on this
+        // define orders thank you page variables
+        const oThanksHeader = {
+          Title: "Success!",
+          Subtitle: "Your purchase is processing",
+        };
+        console.log("returning thank you page after orders post");
+        oThanksHeader.loggedIn = loggedIn;
+        oThanksHeader.navbarAuth = navbarAuth;
+        oThanksHeader.navbarPublic = navbarPublic;
+        // render registration thank you page
+        res.render("ordersThanks", oThanksHeader);
+      });
     });
   });
 });
