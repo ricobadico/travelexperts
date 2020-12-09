@@ -20,6 +20,8 @@ let user_id;
 let user_email;
 let recentSessions = {};
 let loggedIn = false;
+let navbarPublic = true;
+let navbarAuth = false;
 
 //prettier-ignore
 function User(id, firstName, lastName, email) {
@@ -68,11 +70,28 @@ app.use(
 app.use("/", express.static(path.join(__dirname, "static")));
 
 app.use((req, res, next) => {
-  if (!session.sessionID && !req.session.uid) {
-    loggedIn = false;
-  } else {
+  if (req.session.uid) {
+    console.log("Has id");
+    console.log(req.session.uid);
     loggedIn = true;
+    req.session.login = true;
+  } else {
+    console.log("no id");
+    console.log(req.session.uid);
+    loggedIn = false;
+    req.session.login = false;
+    req.session.uid = null;
   }
+  (() => {
+    console.log("do i run");
+    if (loggedIn) {
+      navbarAuth = true;
+      navbarPublic = false;
+    } else {
+      navbarPublic = true;
+      navbarAuth = false;
+    }
+  })();
   next();
 });
 
@@ -91,6 +110,9 @@ app.get("/register", (req, res) => {
     Subtitle:
       "Register for an account to stay up to date on our hottest deals.",
   };
+  registerInputs.loggedIn = loggedIn;
+  registerInputs.navbarAuth = navbarAuth;
+  registerInputs.navbarPublic = navbarPublic;
 
   console.log("render register");
   res.render("register", registerInputs);
@@ -107,6 +129,9 @@ app.get("/packages", (req, res) => {
   connection.query("SELECT * FROM packages", (err, result) => {
     if (err) console.log(err);
 
+    packagesInput.loggedIn = loggedIn;
+    packagesInput.navbarAuth = navbarAuth;
+    packagesInput.navbarPublic = navbarPublic;
     packagesInput.Packages = result;
 
     console.log(packagesInput);
@@ -150,6 +175,15 @@ app.post("/orders", (req, res) => {
       ordersInput.PkgEndDate = result[0].PkgEndDate;
       console.log(ordersInput);
       console.log("render orders");
+
+      ordersInput.loggedIn = loggedIn;
+      ordersInput.navbarAuth = navbarAuth;
+      ordersInput.navbarPublic = navbarPublic;
+      if (req.session.uid) {
+        ordersInput.uid = req.session.uid;
+      } else {
+        ordersInput.uid = "";
+      }
       res.render("orders", ordersInput);
       //   packagesInput.Packages = result;
 
@@ -176,6 +210,10 @@ app.post("/orderPOST", (req, res) => {
       ordersInput.PkgDesc = result[0].PkgDesc;
       console.log(ordersInput);
       console.log("render orders");
+
+      ordersInput.loggedIn = loggedIn;
+      ordersInput.navbarAuth = navbarAuth;
+      ordersInput.navbarPublic = navbarPublic;
       res.render("orders", ordersInput);
       connection.end();
     }
@@ -190,6 +228,9 @@ app.post("/orderPOST", (req, res) => {
     Subtitle: "Your purchase is processing",
   };
   console.log("returning thank you page after orders post");
+  oThanksHeader.loggedIn = loggedIn;
+  oThanksHeader.navbarAuth = navbarAuth;
+  oThanksHeader.navbarPublic = navbarPublic;
   // render registration thank you page
   res.render("ordersThanks", oThanksHeader);
 
@@ -247,6 +288,24 @@ app.post("/orderPOST", (req, res) => {
   });
 });
 
+app.post("/logout", (req, res, next) => {
+  req.session.uid = null;
+  loggedIn = false;
+  navbarAuth = false;
+  navbarPublic = true;
+  //this will be post route of `/`
+
+  homeInputs = {
+    skipIntro: req.query.skipIntro,
+    introSplashNumber: `${randomNum(6)}`,
+  };
+
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
+});
+
 app.get("/", (req, res) => {
   if (recentSessions) {
     console.dir(recentSessions);
@@ -255,10 +314,31 @@ app.get("/", (req, res) => {
   //console.log(req.query);
   console.log("render home");
   // the home page is injected with some values that determine whether the intro happens, and what splash image to show
-  res.render("home", {
+  homeInputs = {
     skipIntro: req.query.skipIntro,
     introSplashNumber: `${randomNum(6)}`,
-  });
+  };
+
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
+});
+
+//for logout
+app.post("/", (req, res) => {
+  if (recentSessions) {
+    console.dir(recentSessions);
+  }
+  //res.writeHead(200, { "Content-Type": "text/html" });
+  //console.log(req.query);
+  console.log("render home");
+  // the home page is injected with some values that determine whether the intro happens, and what splash image to show
+  homeInputs = {};
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
 });
 
 app.post("/login", (req, res, next) => {
@@ -314,11 +394,21 @@ app.post("/login", (req, res, next) => {
     }
   });
   // so the problem is that the code in queries excutes after below and after the req.end()
-  req.session.email = "testString2";
-  res.setHeader("Content-Type", "text/html");
-  res.write("<p>Post Query OK</p>");
-  res.write(`<p>${message}</p>`);
-  res.end();
+  //req.session.email = "testString2";
+  //res.setHeader("Content-Type", "text/html");
+  //res.write("<p>Post Query OK</p>");
+  //res.write(`<p>${message}</p>`);
+  //res.end();
+
+  homeInputs = {
+    skipIntro: true,
+    introSplashNumber: `${randomNum(6)}`,
+  };
+
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
 });
 
 app.get("/error", (req, res) => {
@@ -371,6 +461,10 @@ app.get("/contact", (req, res) => {
     console.log("render contacts");
     // We now have all the data needed to populate the template, in the form the template is expecting
     // prettier-ignore
+      contactInputs.loggedIn = loggedIn;
+      contactInputs.navbarAuth = navbarAuth;
+      contactInputs.navbarPublic = navbarPublic;
+      console.dir(contactInputs);
     res.render("contacts2", contactInputs);
     connection.end();
   });
@@ -470,6 +564,10 @@ app.post("/registerPOST", (req, res) => {
   console.log("returning thank you page after register post");
   console.log(req.body.firstName);
   // render registration thank you page
+
+  rThanksHeader.loggedIn = loggedIn;
+  rThanksHeader.navbarAuth = navbarAuth;
+  rThanksHeader.navbarPublic = navbarPublic;
   res.render("registerThanks", rThanksHeader);
 });
 
