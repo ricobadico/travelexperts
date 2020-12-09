@@ -20,6 +20,8 @@ let user_id;
 let user_email;
 let recentSessions = {};
 let loggedIn = false;
+let navbarPublic = true;
+let navbarAuth = false;
 
 //prettier-ignore
 function User(id, firstName, lastName, email) {
@@ -68,11 +70,28 @@ app.use(
 app.use("/", express.static(path.join(__dirname, "static")));
 
 app.use((req, res, next) => {
-  if (!session.sessionID && !req.session.uid) {
-    loggedIn = false;
-  } else {
+  if (req.session.uid) {
+    console.log("Has id");
+    console.log(req.session.uid);
     loggedIn = true;
+    req.session.login = true;
+  } else {
+    console.log("no id");
+    console.log(req.session.uid);
+    loggedIn = false;
+    req.session.login = false;
+    req.session.uid = null;
   }
+  (() => {
+    console.log("do i run");
+    if (loggedIn) {
+      navbarAuth = true;
+      navbarPublic = false;
+    } else {
+      navbarPublic = true;
+      navbarAuth = false;
+    }
+  })();
   next();
 });
 
@@ -247,7 +266,27 @@ app.post("/orderPOST", (req, res) => {
   });
 });
 
+app.post("/logout", (req, res, next) => {
+  req.session.uid = null;
+  //this will be post route of `/`
+  res.render("home");
+});
+
 app.get("/", (req, res) => {
+  if (recentSessions) {
+    console.dir(recentSessions);
+  }
+  //res.writeHead(200, { "Content-Type": "text/html" });
+  //console.log(req.query);
+  console.log("render home");
+  // the home page is injected with some values that determine whether the intro happens, and what splash image to show
+  res.render("home", {
+    skipIntro: req.query.skipIntro,
+    introSplashNumber: `${randomNum(6)}`,
+  });
+});
+//for logout
+app.post("/", (req, res) => {
   if (recentSessions) {
     console.dir(recentSessions);
   }
@@ -371,6 +410,10 @@ app.get("/contact", (req, res) => {
     console.log("render contacts");
     // We now have all the data needed to populate the template, in the form the template is expecting
     // prettier-ignore
+      contactInputs.loggedIn = loggedIn;
+      contactInputs.navbarAuth = navbarAuth;
+      contactInputs.navbarPublic = navbarPublic;
+      console.dir(contactInputs);
     res.render("contacts2", contactInputs);
     connection.end();
   });
