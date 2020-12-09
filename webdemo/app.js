@@ -173,6 +173,7 @@ app.post("/orders", (req, res) => {
       ordersInput.PkgDesc = result[0].PkgDesc;
       ordersInput.PkgStartDate = result[0].PkgStartDate;
       ordersInput.PkgEndDate = result[0].PkgEndDate;
+      ordersInput.PackageId = req.body.packageId;
       console.log(ordersInput);
       console.log("render orders");
 
@@ -195,44 +196,10 @@ app.post("/orders", (req, res) => {
   );
 });
 
-// Orders Page Submit --> submits order confirmation, updating relevant db tables, go to thank you page [Eric]
-app.post("/orderPOST", (req, res) => {
-  // First, we need to open a database connection:
-  let connection = getConnection();
-  connection.connect();
-  connection.query(
-    "SELECT * FROM packages where PackageId = ?",
-    req.body.packageId,
-    (err, result) => {
-      if (err) console.log(err);
-      ordersInput.PkgName = result[0].PkgName;
-      ordersInput.PkgBasePrice = result[0].PkgBasePrice;
-      ordersInput.PkgDesc = result[0].PkgDesc;
-      console.log(ordersInput);
-      console.log("render orders");
-
-      ordersInput.loggedIn = loggedIn;
-      ordersInput.navbarAuth = navbarAuth;
-      ordersInput.navbarPublic = navbarPublic;
-      res.render("orders", ordersInput);
-      connection.end();
-    }
-  );
-});
-
 // ordersPOST renders thank you page after posting to database
 app.post("/orderPOST", (req, res) => {
-  // define orders thank you page variables
-  const oThanksHeader = {
-    Title: "Success!",
-    Subtitle: "Your purchase is processing",
-  };
-  console.log("returning thank you page after orders post");
-  oThanksHeader.loggedIn = loggedIn;
-  oThanksHeader.navbarAuth = navbarAuth;
-  oThanksHeader.navbarPublic = navbarPublic;
-  // render registration thank you page
-  res.render("ordersThanks", oThanksHeader);
+  let connection = getConnection();
+  connection.connect();
 
   //STEP 1 -----
   // TODO: Get all data needed to fill in a row of the bookings table in db
@@ -284,6 +251,17 @@ app.post("/orderPOST", (req, res) => {
       connection.end();
 
       // TODO Need to insert render of thank you - I think maybe susan is on this
+      // define orders thank you page variables
+      const oThanksHeader = {
+        Title: "Success!",
+        Subtitle: "Your purchase is processing",
+      };
+      console.log("returning thank you page after orders post");
+      oThanksHeader.loggedIn = loggedIn;
+      oThanksHeader.navbarAuth = navbarAuth;
+      oThanksHeader.navbarPublic = navbarPublic;
+      // render registration thank you page
+      res.render("ordersThanks", oThanksHeader);
     });
   });
 });

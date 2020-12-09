@@ -68,7 +68,7 @@
                 <div class="col-sm">
                     <h2 id="packageTotalCost">${{PkgBasePrice}}.00</h2>
                     {{!-- In addition to showing the cost above with currency format, hide actual numeric cost in form value. --}}
-                    <input type="hidden" id="totalCostFormField" name="OrderTotalCost"/>
+                    <input type="hidden" id="totalCostFormField" name="OrderTotalCost" value ={{PkgBasePrice}}/>
                 </div>
             </div>
         </div>
