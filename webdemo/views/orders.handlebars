@@ -15,10 +15,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm">
-                    <h2> Package Name:</h2>
+                    <h4> Package Name:</h4>
                 </div>
                 <div class="col-sm">
-                    <h2>{{PkgName}} </h2>
+                    <p>{{PkgName}} </p>
                     {{!-- Each inserted value has a hidden form field that passes the data along in the form submit. --}}
                     {{!-- This saves us from needing to repeat database SELECT calls later on in app.js --}}
                     <input type="hidden" name="PkgName" value="{{PkgName}}"/> 
@@ -26,53 +26,52 @@
             </div>
             <div class="row">
                 <div class="col-sm">
-                    <h2>Description:</h2>
+                    <h4>Description:</h4>
                 </div>
                 <div class="col-sm">
-                    <h2><i>{{PkgDesc}}</i></h2>
+                    <p><i>{{PkgDesc}}</i></p>
                     <input type="hidden" name="PkgDesc" value="{{PkgDesc}}"/> 
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm">
-                    <h2>Order Date: </h2>
+                    <h4>Order Date: </h4>
                 </div>
                 <div class="col-sm">
-                    <h2>{{date}}</h2>
+                    <p>{{date}}</p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm">
-                    <h2>Price:</h2>
+                    <h4>Price:</h4>
                 </div>
                 <div class="col-sm">
-                    <h2 id="packageSingleCost">${{PkgBasePrice}}.00</h2>
+                    <p id="packageSingleCost">${{PkgBasePrice}}.00</p>
                 </div>
             </div>
             {{!-- Extra functionality to allow for buying multiple tickets [Eric] --}}
             {{!-- Adding a row to choose quantity of travellers --}}
             <div class="row">
                 <div class="col-sm">
-                    <h2>Number of travellers:</h2>
+                    <h4>Number of travellers:</h4>
                 </div>
                 <div class="col-sm">
                     {{!-- This field has a function that updates total cost every time the user changes its value --}}
-                    <input class="order-form-input" type="number" value="1" id="orderquantity" name="TravelerCount" onchange=updateTotal()>
+                    <input class="order-form-input" min="1" type="number" value="1" id="orderquantity" name="TravelerCount" onchange=updateTotal()>
                 </div>
             </div>
             {{!-- Adding a row to show cost --}}
             <div class="row">
                 <div class="col-sm">
-                    <h2><b>Total Cost:</b></h2>
+                    <h4><b>Total Cost:</b></h4>
                 </div>
                 <div class="col-sm">
-                    <h2 id="packageTotalCost">${{PkgBasePrice}}.00</h2>
+                    <p id="packageTotalCost">${{PkgBasePrice}}.00</p>
                     {{!-- In addition to showing the cost above with currency format, hide actual numeric cost in form value. --}}
                     <input type="hidden" id="totalCostFormField" name="OrderTotalCost" value ={{PkgBasePrice}}/>
                 </div>
             </div>
         </div>
-
         <hr />
 
         {{!-- Adding a section for contact info that only appears if not logged in [Eric]--}}

@@ -1,14 +1,11 @@
-html, body {
+body {
     height: 100%;
     width: 100%;
     margin: 0; 
     background-image: url("/media/leaves.jpg");
     background-repeat: no-repeat; 
     background-size: cover;
-<<<<<<< HEAD
-=======
     background-attachment: fixed;
->>>>>>> main
 }
 
 .transparent { 
@@ -80,16 +77,19 @@ input[name]{
   }
 
 footer {
+    position: absolute;
+    width:100%;
+    bottom: 0px;
     height: 36px;
     background-color: rgba(247,245,236,.9);
     display:flex;
     justify-content: center;
     align-items: flex-end;
     box-shadow: 0 -5px 10px rgba(90, 90, 90, .6);
-    margin-top: auto;
-  }
+    margin-top: 30px;
+}
 .order-form-input {
-    font-size: 2rem;
+    font-size: 1em;
     border-radius: 10px;
     width:50px;
     border:none;

@@ -174,11 +174,6 @@ app.post("/orders", (req, res) => {
         ordersInput.uid = "";
       }
       res.render("orders", ordersInput);
-      //   packagesInput.Packages = result;
-
-      //   console.log(packagesInput);
-      //   console.log("render packages");
-      //   res.render("packages", packagesInput);
       connection.end();
     }
   );

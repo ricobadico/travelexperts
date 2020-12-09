@@ -9,8 +9,8 @@ html,body{
 body {
    background-image: url("..//media/plane1.jpg"); /* Photo by Matheus Frade on Unsplash */
    background-size: cover;
-   background-position: center;
-   background-attachment: fixed; 
+   background-position: bottom;
+   background-attachment: fixed;
    
 }
 * {box-sizing: border-box;}
@@ -77,9 +77,8 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(300px, 600px));
     justify-content: center;
     column-gap: 100px;
-    row-gap: 50px;
-    margin-top: 40px;
-    
+    row-gap: 30px;
+    margin-top: 30px;
 }
 
 .package-grid {
@@ -117,13 +116,15 @@ body {
 }
 
 footer {
-    height: 36px;
-    background-color: rgba(247,245,236,.9);
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 -5px 10px rgba(90, 90, 90, .6);
-    margin-top: 50px;
+  width:100%;
+  bottom: 0px;
+  height: 36px;
+  background-color: rgba(247,245,236,.9);
+  display:flex;
+  justify-content: center;
+  align-items: flex-end;
+  box-shadow: 0 -5px 10px rgba(90, 90, 90, .6);
+  margin-top: 30px;
 }
 
 /* colourizes input values */
