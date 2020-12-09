@@ -285,8 +285,20 @@ app.post("/orderPOST", (req, res) => {
 
 app.post("/logout", (req, res, next) => {
   req.session.uid = null;
+  loggedIn = false;
+  navbarAuth = false;
+  navbarPublic = true;
   //this will be post route of `/`
-  res.render("home");
+
+  homeInputs = {
+    skipIntro: req.query.skipIntro,
+    introSplashNumber: `${randomNum(6)}`,
+  };
+
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
 });
 
 app.get("/", (req, res) => {
@@ -317,11 +329,7 @@ app.post("/", (req, res) => {
   //console.log(req.query);
   console.log("render home");
   // the home page is injected with some values that determine whether the intro happens, and what splash image to show
-  homeInputs = {
-    skipIntro: req.query.skipIntro,
-    introSplashNumber: `${randomNum(6)}`,
-  };
-
+  homeInputs = {};
   homeInputs.loggedIn = loggedIn;
   homeInputs.navbarAuth = navbarAuth;
   homeInputs.navbarPublic = navbarPublic;
@@ -381,14 +389,14 @@ app.post("/login", (req, res, next) => {
     }
   });
   // so the problem is that the code in queries excutes after below and after the req.end()
-  req.session.email = "testString2";
-  res.setHeader("Content-Type", "text/html");
-  res.write("<p>Post Query OK</p>");
-  res.write(`<p>${message}</p>`);
+  //req.session.email = "testString2";
+  //res.setHeader("Content-Type", "text/html");
+  //res.write("<p>Post Query OK</p>");
+  //res.write(`<p>${message}</p>`);
   //res.end();
 
   homeInputs = {
-    skipIntro: req.query.skipIntro,
+    skipIntro: true,
     introSplashNumber: `${randomNum(6)}`,
   };
 
