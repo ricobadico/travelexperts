@@ -9,7 +9,7 @@ html,body{
 body {
    background-image: url("..//media/plane1.jpg"); /* Photo by Matheus Frade on Unsplash */
    background-size: cover;
-   background-position: bottom;
+   background-position: center;
    background-attachment: fixed;
    
 }
@@ -23,22 +23,6 @@ body {
     background-color: #b6b6b6;
     margin-bottom: 50px;
 } */
-
-
-.bg-img {
-  /* The image */
-  background-image: url("..//media/Mountains.jpg");
-  width: fill;
-  min-height: 200px;
-
-  /* Center and scale the image  */
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  
-  /* position the navbar */
-  position: relative;
-}
 
 /*  navbar container inside the image */
 .container {
