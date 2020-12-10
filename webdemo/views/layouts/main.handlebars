@@ -25,12 +25,22 @@
   </head>
   
   <body>
-
-		{{{body}}}	  
-
-  <footer>
-    <h6><center>Copyright &#169 by Travel Experts 2020</center></h6>
-  </footer>
+	  
+	  {{!-- We use a flex container to space out the header, content, and footer --}}
+	  <div class="layoutwrap" style="height:100vh; display: flex; flex-direction:column; justify-content:space-between">
+		
+		{{!-- this wrapper ensures that the whole of the handlepart template passed in is justified as a single chunk --}}
+		<div class="contentwrap">
+			  {{{body}}}	 
+		</div>
+		  	 
+		{{!-- Because of wrapper's justify-content:space-between, footer always gets pushed as far down as possible. --}}
+		<footer>
+			<h6><center>Copyright &#169 by Travel Experts 2020</center></h6>
+		</footer>
+	  </div>
+	
+  
 
 	
 
