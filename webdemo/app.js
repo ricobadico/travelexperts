@@ -114,8 +114,10 @@ app.get("/packages", (req, res) => {
   };
   let connection = getConnection();
   connection.connect();
+
+  let datestring = `${new Date()}`
   // TODO: Need to change this to only find packages in the future. This means we need to change dates in the db
-  connection.query("SELECT * FROM packages", (err, result) => {
+  connection.query("SELECT * FROM packages WHERE PkgStartDate > ? ORDER BY PkgStartDate", new Date(), (err, result) => {
 
     if (err) console.log(err);
 
