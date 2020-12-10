@@ -7,7 +7,7 @@ html,body{
 }
 
 body {
-   background-image: url("..//media/plane1.jpg"); /* Photo by Matheus Frade on Unsplash */
+   background-image: url("/media/plane1.jpg"); /* Photo by Matheus Frade on Unsplash */
    background-size: cover;
    background-position: center;
    background-attachment: fixed;
