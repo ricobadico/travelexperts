@@ -450,8 +450,8 @@ app.post("/registerPOST", (req, res) => {
   //You could instead write it as a string directly as the connection.query first argument
   //Note this query looks like a lot - the format really just mean:
   //INSERT A NEW ENTRY INTO [a database table] (data,for,this,list,of,columns) THESE VALUE (one,datum,for,each,column,respectively)
-  let sql = "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustBusPhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal` , `CustBusPhone`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  let inserts = [firstName, lastName, email, pNumber, pNumber, address, city, prov, pCode, pNumber];
+  let sql = "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustBusPhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  let inserts = [firstName, lastName, email, pNumber, pNumber, address, city, prov, pCode];
   sql = mysql.format(sql, inserts);
   console.log(sql);
 
