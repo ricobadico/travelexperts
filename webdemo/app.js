@@ -1,3 +1,8 @@
+// Initial server script created by [Susan], with lots of input from [everyone]. 
+// High credit for [Bob] who managed the inclusion and implementation of most additional modules:
+// especially express-session, bcrypt, redis, morgan for dev.
+// Routes are credited inline.
+
 const express = require("express");
 const mysql = require("mysql");
 const path = require("path");
@@ -15,6 +20,10 @@ const { connected } = require("process");
 const saltRounds = 10;
 const { formatDate } = require("./static/js/formatDate.js");
 
+// Define a user session stored through redis module (needed for login) [Bob]
+// **IMPORTANT**: please note the computer running the server requires
+// an installation of Redis for the code to function.
+// Downloading the .msi here will suffice:  https://github.com/microsoftarchive/redis/releases/tag/win-3.0.504
 const RedisStore = require("connect-redis")(session);
 const redisClient = redis.createClient();
 let user_id;
@@ -24,7 +33,6 @@ let loggedIn = false;
 let navbarPublic = true;
 let navbarAuth = false;
 
-//prettier-ignore
 function User(id, firstName, lastName, email) {
     (this.userid = id),
     (this.firstName = firstName),
@@ -49,8 +57,8 @@ if (process.env.NODE_ENV === "dev") {
   // log req res in dev
   app.use(morgan("dev"));
 }
-// prettier-ignore
-// session to identify unique client session and login auth
+
+// session to identify unique client session and login auth [Bob]
 app.use( 
   session({
     genid : (req) => {
@@ -68,9 +76,10 @@ app.use(
   })
 );
 
+// Serve files in static folder statically
 app.use("/", express.static(path.join(__dirname, "static")));
 
-// Manages the state change for Logged it and out;
+// Manages the state change for Logged in and out [Bob]
 app.use((req, res, next) => {
   if (req.session.uid) {
     loggedIn = true;
@@ -92,6 +101,9 @@ app.use((err, req, res, next) => {
 });
 
 // ROUTES ---------------------------------//
+
+
+// Register page render - base [Susan], login templating setup [Bob]
 app.get("/register", (req, res) => {
   // This data gets passed into the template (in this case, for the header)
   const registerInputs = {
@@ -107,24 +119,33 @@ app.get("/register", (req, res) => {
   res.render("register", registerInputs);
 });
 
+
+// Packages page render - dynamic pull from db [Eric], date formatting [Sheyi, Susan, Eric]
 app.get("/packages", (req, res) => {
+  // Set up data to be passed into template
   packagesInput = {
     Title: "Our Packages",
     Subtitle: "Find the perfect upcoming trip for you.",
   };
+
+  // Connect to db
   let connection = getConnection();
   connection.connect();
 
-  let datestring = `${new Date()}`
+  // Query to grab package data from db -- added date conditional and ordering [Eric]
   connection.query("SELECT * FROM packages WHERE PkgStartDate > ? ORDER BY PkgStartDate", new Date(), (err, result) => {
 
     if (err) console.log(err);
 
+    // Adding login data to template object [Bob]
     packagesInput.loggedIn = loggedIn;
     packagesInput.navbarAuth = navbarAuth;
     packagesInput.navbarPublic = navbarPublic;
+
+    // This line adds an array of package data objects to the template input object - already arranged in such a way as to be used by handlebars 
     packagesInput.Packages = result;
 
+    // Iterates over each package in packageInput.packges and applies a date formatting function to that data [Eric, Susan, Sheyi]
     for (let currentPackageIndex in packagesInput.Packages) {
       packagesInput.Packages[currentPackageIndex].PkgStartDate = formatDate(
         packagesInput.Packages[currentPackageIndex].PkgStartDate
@@ -134,6 +155,7 @@ app.get("/packages", (req, res) => {
       );
     }
 
+    // Log data passed into packagesInput (for clarity server-side), then render it
     console.log(packagesInput);
     console.log("render packages");
     res.render("packages", packagesInput);
@@ -141,19 +163,9 @@ app.get("/packages", (req, res) => {
   });
 });
 
-// Orders Page - [Sheyi w/ Eric Assist]
+// Orders Page render - [Sheyi] w/ [Eric] Assist
 app.post("/orders", (req, res) => {
-  function formatDate(date) {
-    var d = new Date(date),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
-  }
+ 
   date = formatDate(new Date());
 
   const ordersInput = {
@@ -204,6 +216,7 @@ app.post("/orderPOST", (req, res) => {
 
     // Otherwise, we need to insert into the customer table first
   } else {
+    console.log("Request Body below:")
     console.log(req.body);
     let CustFN = req.body.firstName;
     let CustLN = req.body.lastName;
@@ -213,18 +226,13 @@ app.post("/orderPOST", (req, res) => {
     let CustCY = req.body.city;
     let CustPV = req.body.prov;
     let CustPC = req.body.pCode;
+
+    // IMPORTANT NOTE: Travel Experts DB currently treats Customer Business Phone as required and home phone as optional. That seems incorrect for individual customers.
+    // For the prototype, we are fixing this by inserting the customer's inputted phone number into both fields.
+    // However, if we were able to consult with Travel Experts, we would suggest to change CustHomePhone to required and set CustBusPhone as optional. 
     let sql1 =
-      "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    let inserts1 = [
-      CustFN,
-      CustLN,
-      CustEM,
-      CustPH,
-      CustAD,
-      CustCY,
-      CustPV,
-      CustPC,
-    ];
+      "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustBusPhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    let inserts1 = [CustFN, CustLN, CustEM, CustPH, CustPH, CustAD, CustCY, CustPV, CustPC];
     sql1 = mysql.format(sql1, inserts1);
     console.log(sql1);
 
@@ -232,6 +240,9 @@ app.post("/orderPOST", (req, res) => {
       if (err) console.log(err);
       console.log("sql1 result:");
       console.log(result.insertId);
+
+      // We log the insert result just to allow following along in the server
+      console.log(result);
 
       insertBookings(connection, req, res, result);
     });
@@ -414,9 +425,9 @@ app.post("/registerPOST", (req, res) => {
   //Note this query looks like lot - the format really just mean:
   //INSERT A NEW ENTRY INTO [a database table] (data,for,this,list,of,columns) THESE VALUE (one,datum,for,each,column,respectively)
   let sql =
-    "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal` , `CustBusPhone`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustBusPhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal` , `CustBusPhone`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   //prettier-ignore
-  let inserts = [firstName, lastName, email, pNumber, address, city, prov, pCode, pNumber];
+  let inserts = [firstName, lastName, email, pNumber, pNumber, address, city, prov, pCode, pNumber];
   sql = mysql.format(sql, inserts);
   console.log(sql);
 
@@ -430,6 +441,7 @@ app.post("/registerPOST", (req, res) => {
       throw Error;
     }
     // We're going to leave a console.log here just so anyone on the server can confirm that something happened
+    console.log(result);
     recordId = result.insertId;
     let user = new User(recordId, firstName, lastName, email);
     recentSessions[req.session.id] = user;
@@ -471,10 +483,6 @@ app.post("/registerPOST", (req, res) => {
 
       console.log(bcrypt.compareSync(pwd, hash));
     });
-
-    // We've done what we needed and can close the mysql connection!
-    // The user sent a request "/registerPOST" and is expecting a response! You need to tell the response to do something before we finish this express method call.
-    // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
   });
 
   //req.session.uuid = recordId; // should add to
@@ -572,6 +580,7 @@ function insertBookings(connection, req, res, result) {
     if (err) console.log(err);
 
     //In the event of a successful insert, we can grab the newly inserted row's id out of the result object. We'll need it in the next insert query
+    console.log(result);
     let BookingId = result.insertId;
 
     //STEP 2 -----------
@@ -590,6 +599,7 @@ function insertBookings(connection, req, res, result) {
     let sql =
       "INSERT INTO bookingdetails (`TripStart`, `TripEnd`, `Description`, `BasePrice`, `BookingId`) VALUES (?, ?, ?, ?, ?)";
     let inserts = [TripStart, TripEnd, Description, BasePrice, BookingId];
+    console.log(sql);
     sql = mysql.format(sql, inserts);
 
     connection.query(sql, (err, result) => {
