@@ -382,11 +382,10 @@ app.post("/orderPOST", (req, res) => {
 });
 
 
-
-
-// Feisty template render for Contact page, requires nested queries fed into a complicated template
-// It works but occasionally fails to pull from the db, I'll work on it
+// Contact page render, using data from db - [Eric] 
 app.get("/contact", (req, res) => {
+
+  // Connect to db
   let connection = getConnection();
   connection.connect();
 
@@ -394,11 +393,11 @@ app.get("/contact", (req, res) => {
   let contactInputs = { Agencies: [] };
 
   // Query 1 : get the data. results[0] is the array of agencies, results[1] the array of agents
-  // prettier-ignore
   connection.query("SELECT * FROM agencies; SELECT * from agents", function (error, results) {
-    if (error) {
-      console.log(error);
-    } //throw new Error("Failed to load agency table from database");
+    if (error) console.log(error);
+
+    // Assign each query result to a variable
+    console.log(results);
     const agencies = results[0];
     const agents = results[1];
 
@@ -418,29 +417,30 @@ app.get("/contact", (req, res) => {
       // here, we are adding the current agent to the agency at the index corresponding to their id (which is -1)
       contactInputs.Agencies[homeAgency - 1].agents.push(agents[j]);
     }
-    // With the heavy lifting done, we can add any other needed data for the template, in this case the header information
+    // With the heavy lifting done, we can add any other needed data for the template, in this case the header information 
     contactInputs.Title = "Contact Us";
-    contactInputs.Subtitle =
-      "Contact one of our international travel agents for inquiries on your next travel destination.";
+    contactInputs.Subtitle = "Contact one of our international travel agents for inquiries on your next travel destination.";
 
-    console.log("render contacts");
     // We now have all the data needed to populate the template, in the form the template is expecting
-    // prettier-ignore
-      contactInputs.loggedIn = loggedIn;
-      contactInputs.navbarAuth = navbarAuth;
-      contactInputs.navbarPublic = navbarPublic;
-      console.dir(contactInputs);
+    console.log("render contacts");
+    contactInputs.loggedIn = loggedIn;
+    contactInputs.navbarAuth = navbarAuth;
+    contactInputs.navbarPublic = navbarPublic;
+    console.dir(contactInputs);
+
+    // Finally render
     res.render("contacts2", contactInputs);
     connection.end();
   });
 });
 
-// Insert the Register data into the database. All the Register page form needs to do is have "registerPOST" as its action to fire this off
+
+// Register data inserted into the database from Register page form, rendering Thank you page
+// db insert and routing by [Eric], login integration and await refactoring by [Bob], rendering to Thank You page by [Susan]
 app.post("/registerPOST", (req, res) => {
   // This is just fancy "javascript destructuring": assigns these variables to the corresponding properties of the req.body object
-  // prettier-ignore
   let {firstName, lastName, userName, pwd, email, pNumber, address, city, prov, pCode, sendInfo} = req.body;
-  //console.log(req.body);
+
   // Use the defined connection config to connect
   let connection = getConnection();
   connection.connect();
@@ -448,17 +448,15 @@ app.post("/registerPOST", (req, res) => {
   // Make a query based off of register form data, with placeholders for body entries
   // We'll write the sql as a variable on its own line to break up the code a little.
   //You could instead write it as a string directly as the connection.query first argument
-  //Note this query looks like lot - the format really just mean:
+  //Note this query looks like a lot - the format really just mean:
   //INSERT A NEW ENTRY INTO [a database table] (data,for,this,list,of,columns) THESE VALUE (one,datum,for,each,column,respectively)
-  let sql =
-    "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustBusPhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal` , `CustBusPhone`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  //prettier-ignore
+  let sql = "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustBusPhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal` , `CustBusPhone`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   let inserts = [firstName, lastName, email, pNumber, pNumber, address, city, prov, pCode, pNumber];
   sql = mysql.format(sql, inserts);
   console.log(sql);
 
-  // Use a mysql connection's built-in query function to query the database. First argument is the SQL query, second argument defines placeholders ('?') in that query.
-  // Third argument is the callback that happens once you've successfully gotten back the data (or an error) from the database
+  // Use a mysql connection's built-in query function to query the database. First argument is the SQL query, second argument
+  // is the callback that happens once you've successfully gotten back the data (or an error) from the database
   let recordId;
   connection.query(sql, async (err, result) => {
     if (err) {
@@ -468,6 +466,8 @@ app.post("/registerPOST", (req, res) => {
     }
     // We're going to leave a console.log here just so anyone on the server can confirm that something happened
     console.log(result);
+
+    // Create new user from customer entry [Bob]
     recordId = result.insertId;
     let user = new User(recordId, firstName, lastName, email);
     recentSessions[req.session.id] = user;
@@ -517,7 +517,8 @@ app.post("/registerPOST", (req, res) => {
   user_email = email; //for testing
   // create User object
   console.dir(recentSessions);
-  // define registration thank you page variables which includes customer first name
+
+  // define registration thank you page variables which includes customer first name [Susan]
   const rThanksHeader = {
     Title: "Success!",
     Subtitle: "Your registration was successful",
@@ -525,15 +526,18 @@ app.post("/registerPOST", (req, res) => {
   };
   console.log("returning thank you page after register post");
   console.log(req.body.firstName);
-  // render registration thank you page
 
+  // add login info to template data object [Bob]
   rThanksHeader.loggedIn = loggedIn;
   rThanksHeader.navbarAuth = navbarAuth;
   rThanksHeader.navbarPublic = navbarPublic;
+
+  // render registration thank you page
   res.render("registerThanks", rThanksHeader);
 });
 
-// for testing the login
+
+// for testing the login [Bob]
 app.get("/sessionTest", (req, res, next) => {
   if (req.session.views) {
     req.session.views++;
@@ -568,6 +572,8 @@ app.get("/sessionTest", (req, res, next) => {
     res.end("welcome to the session demo. refresh!");
   }
 });
+
+
 // Start the express server listen for requests and send responses
 app.listen(PORT, () => {
   console.log(
@@ -575,10 +581,10 @@ app.listen(PORT, () => {
   );
 });
 
-// Helper function to insert bookings, cleans up code in /ordersPOST route
+// Helper function to insert bookings, cleans up code in /ordersPOST route -- [Eric], connection to Thank you page [Susan]
 function insertBookings(connection, req, res, result) {
   //STEP 1 -----
-  // TODO: Get all data needed to fill in a row of the bookings table in db
+  // Get all data needed to fill in a row of the bookings table in db
   // That includes BookingDate, BookingNo(?), TravelerCount, CustomerID, TripTypeId(?), PackageId
   // Some of those values we aren't getting from anywhere (marked with a ?), let's leave them null
   // Luckily, the rest we can get from req.body from the previous page
@@ -610,7 +616,7 @@ function insertBookings(connection, req, res, result) {
     let BookingId = result.insertId;
 
     //STEP 2 -----------
-    // TODO Get all data needed to fill in a row of bookingdetails table in db
+    // Get all data needed to fill in a row of bookingdetails table in db
     // That includes ItineraryNo(?), TripStart, TripEnd, Description, Destination(?), BasePrice, AgencyCommission(?), BookingId, RegionId(?), ClassId(?), FeeId(?), ProductSupplierId(?)
     // Note we need BookingId which means we have to insert into the bookings table above first, then grab the id from the result
     // The form will be fairly similar to the step 1 above. Note some values come from the package table (they aren't 3NF!) and we could do another query to get them...
@@ -634,8 +640,7 @@ function insertBookings(connection, req, res, result) {
       console.log(result);
       connection.end();
 
-      // TODO Need to insert render of thank you - I think maybe susan is on this
-      // define orders thank you page variables
+      // define orders thank you page variables [Susan]
       const oThanksHeader = {
         Title: "Success!",
         Subtitle: "Your purchase is processing",
