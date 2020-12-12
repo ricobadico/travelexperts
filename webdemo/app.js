@@ -221,6 +221,7 @@ app.post("/error", (req, res) => {
 
 // Register page render - base [Susan], login templating setup [Bob]
 app.get("/register", (req, res) => {
+
   // This data gets passed into the template (in this case, for the header)
   const registerInputs = {
     Title: "Register",
