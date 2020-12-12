@@ -1,3 +1,4 @@
+// Found by [Susan] 
 $(function () {
   $(".img-w").each(function () {
     $(this).wrap("<div class='img-c'></div>");
