@@ -102,6 +102,122 @@ app.use((err, req, res, next) => {
 
 // ROUTES ---------------------------------//
 
+// Home render -- base [Susan], [Eric] adding custom intro tie-in, [Bob] connecting to login  
+app.get("/", (req, res) => {
+  if (recentSessions) {
+    console.dir(recentSessions);
+  }
+  //res.writeHead(200, { "Content-Type": "text/html" });
+  //console.log(req.query);
+  console.log("render home");
+  // the home page is injected with some values that determine whether the intro happens, and what splash image to show
+  homeInputs = {
+    skipIntro: req.query.skipIntro,
+    introSplashNumber: `${randomNum(6)}`,
+  };
+
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
+});
+
+
+// Logout route - [Bob]
+app.post("/logout", (req, res, next) => {
+  req.session.uid = null;
+  loggedIn = false;
+  navbarAuth = false;
+  navbarPublic = true;
+  //this will be post route of `/`
+
+  homeInputs = {
+    skipIntro: req.query.skipIntro,
+    introSplashNumber: `${randomNum(6)}`,
+  };
+
+  homeInputs.skipIntro = true;
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
+});
+
+
+//for logout - [Bob]
+app.post("/", (req, res) => {
+  if (recentSessions) {
+    console.dir(recentSessions);
+  }
+  //res.writeHead(200, { "Content-Type": "text/html" });
+  //console.log(req.query);
+  console.log("render home");
+  // the home page is injected with some values that determine whether the intro happens, and what splash image to show
+  homeInputs = {};
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
+});
+
+//  Login route - [Bob]
+app.post("/login", (req, res, next) => {
+  let connection = getConnection();
+  connection.connect();
+  let dbResult;
+  let results;
+
+  let sql = "SELECT * FROM ?? WHERE ?? = ?";
+  let inserts = ["web_credentials", "Username", req.body.username];
+  sql = mysql.format(sql, inserts);
+  connection.query(sql, async (err, results) => {
+    if (err) {
+      console.error(err);
+      connection.end();
+      // do some redirect ********************TODO************
+    } else {
+      //console.log(results);
+      dbResult = results;
+      //console.log(req.body.password);
+      await bcrypt.compare(
+        req.body.password,
+        results[0].Hash,
+        async (err, result) => {
+          if (err) {
+            console.error(err);
+            connection.end();
+          } else if (result) {
+            //true
+            console.log("passwords match");
+          } else {
+            // false
+            console.log("password do not match");
+            //do some redirect
+            //***************************TODO********************//
+          }
+        }
+      );
+      console.dir(req.session);
+      if (dbResult) {
+        req.session.uid = dbResult[0].CustomerId;
+        req.session.save();
+      }
+      connection.end();
+    }
+    res.redirect("/?skipIntro=true");
+  });
+});
+
+
+// Error routes [Bob]
+app.get("/error", (req, res) => {
+  res.render("error", { httpcode: res.status, message: "Error Message" });
+});
+
+app.post("/error", (req, res) => {
+  res.render("error", { httpcode: res.status, message: "Error Message" });
+});
+
 
 // Register page render - base [Susan], login templating setup [Bob]
 app.get("/register", (req, res) => {
@@ -266,116 +382,7 @@ app.post("/orderPOST", (req, res) => {
 });
 
 
-// Logout route - [Bob]
-app.post("/logout", (req, res, next) => {
-  req.session.uid = null;
-  loggedIn = false;
-  navbarAuth = false;
-  navbarPublic = true;
-  //this will be post route of `/`
 
-  homeInputs = {
-    skipIntro: req.query.skipIntro,
-    introSplashNumber: `${randomNum(6)}`,
-  };
-
-  homeInputs.skipIntro = true;
-  homeInputs.loggedIn = loggedIn;
-  homeInputs.navbarAuth = navbarAuth;
-  homeInputs.navbarPublic = navbarPublic;
-  res.render("home", homeInputs);
-});
-
-
-app.get("/", (req, res) => {
-  if (recentSessions) {
-    console.dir(recentSessions);
-  }
-  //res.writeHead(200, { "Content-Type": "text/html" });
-  //console.log(req.query);
-  console.log("render home");
-  // the home page is injected with some values that determine whether the intro happens, and what splash image to show
-  homeInputs = {
-    skipIntro: req.query.skipIntro,
-    introSplashNumber: `${randomNum(6)}`,
-  };
-
-  homeInputs.loggedIn = loggedIn;
-  homeInputs.navbarAuth = navbarAuth;
-  homeInputs.navbarPublic = navbarPublic;
-  res.render("home", homeInputs);
-});
-
-//for logout
-app.post("/", (req, res) => {
-  if (recentSessions) {
-    console.dir(recentSessions);
-  }
-  //res.writeHead(200, { "Content-Type": "text/html" });
-  //console.log(req.query);
-  console.log("render home");
-  // the home page is injected with some values that determine whether the intro happens, and what splash image to show
-  homeInputs = {};
-  homeInputs.loggedIn = loggedIn;
-  homeInputs.navbarAuth = navbarAuth;
-  homeInputs.navbarPublic = navbarPublic;
-  res.render("home", homeInputs);
-});
-
-app.post("/login", (req, res, next) => {
-  let connection = getConnection();
-  connection.connect();
-  let dbResult;
-  let results;
-
-  let sql = "SELECT * FROM ?? WHERE ?? = ?";
-  let inserts = ["web_credentials", "Username", req.body.username];
-  sql = mysql.format(sql, inserts);
-  connection.query(sql, async (err, results) => {
-    if (err) {
-      console.error(err);
-      connection.end();
-      // do some redirect ********************TODO************
-    } else {
-      //console.log(results);
-      dbResult = results;
-      //console.log(req.body.password);
-      await bcrypt.compare(
-        req.body.password,
-        results[0].Hash,
-        async (err, result) => {
-          if (err) {
-            console.error(err);
-            connection.end();
-          } else if (result) {
-            //true
-            console.log("passwords match");
-          } else {
-            // false
-            console.log("password do not match");
-            //do some redirect
-            //***************************TODO********************//
-          }
-        }
-      );
-      console.dir(req.session);
-      if (dbResult) {
-        req.session.uid = dbResult[0].CustomerId;
-        req.session.save();
-      }
-      connection.end();
-    }
-    res.redirect("/?skipIntro=true");
-  });
-});
-
-app.get("/error", (req, res) => {
-  res.render("error", { httpcode: res.status, message: "Error Message" });
-});
-
-app.post("/error", (req, res) => {
-  res.render("error", { httpcode: res.status, message: "Error Message" });
-});
 
 // Feisty template render for Contact page, requires nested queries fed into a complicated template
 // It works but occasionally fails to pull from the db, I'll work on it
