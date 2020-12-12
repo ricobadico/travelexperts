@@ -1,6 +1,9 @@
 
-	<link rel="stylesheet" href="/css/style3.css">
+	{{!-- Initial Static Page Designed by [Susan], connecting to database and some layout changes by [Eric], final UX fixes by [Susan] --}}
 	
+	<link rel="stylesheet" href="/css/style3.css">
+
+	{{!-- Partial templates for header and navbar  --}}
 	{{> jumbotron}}
 
 	{{#if loggedIn}} {{> navbarLoggedIn}} {{else}} {{> navbar}}{{/if}}
@@ -24,7 +27,7 @@
 			</div>
 		</div>
 
-		{{!-- This each populates the array of agent objects --}}
+		{{!-- This #each populates the array of agent objects --}}
 	  	<div class="row">
 			{{#each agents}}
 	    	<div class="col-12 col-sm-6 col-md-4 col-lg-3">
