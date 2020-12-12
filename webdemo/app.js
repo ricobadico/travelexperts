@@ -429,7 +429,7 @@ app.get("/contact", (req, res) => {
     console.dir(contactInputs);
 
     // Finally render
-    res.render("contacts2", contactInputs);
+    res.render("contacts", contactInputs);
     connection.end();
   });
 });
