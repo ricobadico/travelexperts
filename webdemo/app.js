@@ -163,32 +163,41 @@ app.get("/packages", (req, res) => {
   });
 });
 
-// Orders Page render - [Sheyi] w/ [Eric] Assist
+
+// Orders Page render (accessible by clicking an order button for one package on Packages page) - [Sheyi] w/ [Eric] Assist
 app.post("/orders", (req, res) => {
  
+  // Use formatDate module to create a new date with human-friendly formatting [Sheyi]
   date = formatDate(new Date());
 
+  // Setup data object for handlebars render
   const ordersInput = {
     Title: "Your Order",
     Subtitle: "Finish your planning ",
     date: `${date}`,
   };
+
+  // Connect to db
   let connection = getConnection();
   connection.connect();
+
+  // Run query to just get package data from the package clicked on last page (packageID sent in request)
   connection.query(
-    "SELECT * FROM packages where PackageId = ?",
-    req.body.packageId,
-    (err, result) => {
+    "SELECT * FROM packages where PackageId = ?", req.body.packageId, (err, result) => {
       if (err) console.log(err);
+
+      // Grab all the relevant data from the resulting query and add it to the tamplate data object [Sheyi] w/ [Eric] assist
       ordersInput.PkgName = result[0].PkgName;
       ordersInput.PkgBasePrice = result[0].PkgBasePrice;
       ordersInput.PkgDesc = result[0].PkgDesc;
       ordersInput.PkgStartDate = result[0].PkgStartDate;
       ordersInput.PkgEndDate = result[0].PkgEndDate;
       ordersInput.PackageId = req.body.packageId;
+
       console.log(ordersInput);
       console.log("render orders");
 
+      //  Add login details - [Bob]
       ordersInput.loggedIn = loggedIn;
       ordersInput.navbarAuth = navbarAuth;
       ordersInput.navbarPublic = navbarPublic;
@@ -203,21 +212,28 @@ app.post("/orders", (req, res) => {
   );
 });
 
-// ordersPOST renders thank you page after posting to database
+// Order post to database and then Thank You Render (from clicking order button on Order page) - [Susan] w/ [Eric] Assist
 app.post("/orderPOST", (req, res) => {
+
+  // Connect to db
   let connection = getConnection();
   connection.connect();
 
   // Depending on whether the user is logged in or not, we may need to run an extra query
-  // We can determine this because CustomerId is only passed in the req if logged in
-  //if logged in, we go straight to inserting the bookings
+  // We can determine this because CustomerId is *only* passed in the req if logged in
+  // If logged in, we go straight to inserting the bookings
   if (req.body.CustomerId) {
+
+    // There's a lot going on in this insertBookings function - two database inserts are made. 
+    // This was abstracted into a function to make this route more readable
     insertBookings(connection, req, res, null);
 
     // Otherwise, we need to insert into the customer table first
   } else {
     console.log("Request Body below:")
     console.log(req.body);
+
+    // Grab customer info from form data sent through request
     let CustFN = req.body.firstName;
     let CustLN = req.body.lastName;
     let CustEM = req.body.email;
@@ -236,19 +252,21 @@ app.post("/orderPOST", (req, res) => {
     sql1 = mysql.format(sql1, inserts1);
     console.log(sql1);
 
+    // Do insert query to add customer entry
     connection.query(sql1, (err, result) => {
       if (err) console.log(err);
-      console.log("sql1 result:");
-      console.log(result.insertId);
 
       // We log the insert result just to allow following along in the server
       console.log(result);
 
+      // Now that we have a new customer inserting (and can access the insertID through result, we run the large insertBookings function)
       insertBookings(connection, req, res, result);
     });
   }
 });
 
+
+// Logout route - [Bob]
 app.post("/logout", (req, res, next) => {
   req.session.uid = null;
   loggedIn = false;
@@ -267,6 +285,7 @@ app.post("/logout", (req, res, next) => {
   homeInputs.navbarPublic = navbarPublic;
   res.render("home", homeInputs);
 });
+
 
 app.get("/", (req, res) => {
   if (recentSessions) {
