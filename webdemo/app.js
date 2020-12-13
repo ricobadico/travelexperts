@@ -194,6 +194,46 @@ app.post("/login", (req, res, next) => {
   });
 });
 
+const isExistingUsername = (username, callback) => {
+    //query the database for the username and see if there is a match
+    //let returnValue = null;
+    let connection = getConnection();
+    connection.connect();
+    let sql = "SELECT Username FROM web_credentials WHERE Username = ?"
+    let insert = [username];
+    sql = mysql.format(sql,insert);
+    console.log(`validate user ${username}`);
+    //console.log(`sql: ${sql}`);
+    connection.query(sql, (err, result) => {
+      if (err) {
+        console.error(err);
+        // see what is in here on an error?? if any
+        console.dir(result);
+        connection.end();
+        // do something here to not crash 
+        return undefined;
+      }
+      console.log(`Query success!`)
+      //inspect the result object
+      //console.dir(result);
+      if (result.length > 0) {
+        connection.end();
+        //returnValue = true;
+        callback(true);
+      } else {
+        connection.end();
+        //returnValue = false;
+        callback(false);
+      }
+    });
+}
+
+
+
+
+isExistingUsername("jxffbob", (result) => console.log(result)); // an non existing user
+//isExistingUsername("jeffbob", (result) => console.log(result)); // an non existing user
+
 
 // Error routes [Bob]
 app.get("/error", (req, res) => {
@@ -439,7 +479,6 @@ app.post("/registerPOST", (req, res) => {
   let recordId;
   connection.query(sql, async (err, result) => {
     if (err) {
-      //await connection.end();
       connection.end();
       console.error(err);
       throw Error;
@@ -454,7 +493,6 @@ app.post("/registerPOST", (req, res) => {
     recentSessions[req.session.id] = user;
     //console.log(result.insertId);
 
-    //await connection.end();
     connection.end();
     // if the customer was inserted we take that record and
     // use it insert and save the salted password hash to the db.
@@ -483,8 +521,6 @@ app.post("/registerPOST", (req, res) => {
             req.session.uid = recordId;
             req.session.email = email;
             console.log(`Store req.session.email = ${req.session.email}`);
-            //await req.session.save();
-            //await connection2.end();
             req.session.save();
             connection2.end();
           }
