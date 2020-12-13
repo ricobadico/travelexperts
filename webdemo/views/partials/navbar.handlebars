@@ -4,10 +4,6 @@
 
 	<a class="navbar-brand active" href="/?skipIntro=true">Travel Experts<span class="sr-only">(current)</span></a>
 
-	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-		<span class="navbar-toggler-icon"></span>
-	</button>
-
 	<div class="collapse navbar-collapse" id="navbarNav">
 		<ul class="navbar-nav">
 
@@ -26,9 +22,18 @@
 		</ul>
 	</div>
 
-  <form name="login-form" class="form-inline" action="/login" method="POST">
-    <input class="form-control mr-sm-2" name="username" required type="text" placeholder="Username" aria-label="Username">
-	<input class="form-control mr-sm-2" name="password" type="password" placeholder="Password" aria-label="Password">
-    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
-  </form>
+	{{!-- [Eric] - wrapped a div around the login and hamburger icon. Previously, the container's jusitify-content: space-bewtween 
+	was maximizing space between elements, and sticking the expand button in the center. Now it's off to the side and looks much cleaner --}}
+	<div style="display: flex; flex-wrap:nowrap;">
+		<form name="login-form" class="form-inline" action="/login" method="POST">
+			<input class="form-control mr-sm-2" name="username" required type="text" placeholder="Username" aria-label="Username">
+			<input class="form-control mr-sm-2" name="password" type="password" placeholder="Password" aria-label="Password">
+			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+		</form>
+
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="margin:10px; height:40px;">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	</div>
+  
 </nav>
