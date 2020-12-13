@@ -51,3 +51,31 @@ function checkNumber(){
   }, false);
 })();
 
+//[Bob] check for existing user
+function checkUsername(){
+  console.log("userName changed")
+  var text = document.getElementById("userName");
+  console.log(window.location.host);
+  let Url = `http://${window.location.host}/checkUsername`;
+  let Data = { username: text.value};
+  let params = {
+    headers:{"content-type": "application/text; charset=UTF-8"},
+    //body:Data,
+    username: text.value,
+    method:"GET"
+  };
+
+  fetch(Url,params)
+    .then(data => {
+      let returnData = data.json();
+      console.dir(returnData);
+      console.dir(data.body);
+      if(!(returnData.existingUser)) {
+	  	  alert("This username is already taken")
+			  userName.focus();
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    })
+  }

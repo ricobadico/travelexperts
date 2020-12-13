@@ -19,6 +19,7 @@ const bcrypt = require("bcrypt");
 const { connected } = require("process");
 const saltRounds = 10;
 const { formatDate } = require("./static/js/formatDate.js");
+const { get } = require("http");
 
 // Define a user session stored through redis module (needed for login) [Bob]
 // **IMPORTANT**: please note the computer running the server requires
@@ -33,6 +34,7 @@ let user_email;
 let recentSessions = {};
 // only this one is truely required and set per request with Session
 let loggedIn = false;
+let allUsers;
 
 // [Bob] was the start of a User model but not really used
 // Once Session was working we use it as we don't use an ORM
@@ -100,6 +102,11 @@ app.use((req, res, next) => {
     req.session.login = false;
     req.session.uid = null;
   }
+  getAllUsers((result) => {
+    req.session.allUsers = result;
+    //allUsers = result;
+    req.session.save();
+  });
   console.dir(req.session);
   next();
 });
@@ -194,6 +201,38 @@ app.post("/login", (req, res, next) => {
   });
 });
 
+
+const getAllUsers = (callback) => {
+    let connection = getConnection();
+    connection.connect();
+    let sql = "SELECT Username FROM web_credentials"
+    connection.query(sql, (err, result) => {
+      if (err) {
+        console.error(err);
+        // see what is in here on an error?? if any
+        console.dir(result);
+        connection.end();
+        // do something here to not crash
+      }
+      console.log(`Query success!`)
+      //inspect the result object
+      //console.dir(result);
+      connection.end()
+      var userArray = [];
+      for (let i = 0; i < result.length; i++) {
+        userArray.push(result[i].Username);
+      }
+      callback(userArray);
+    });
+}
+
+//getAllUsers((result) => {
+//  allUsers = result;
+//  console.log(allUsers);
+//});
+
+
+//[Bob]
 const isExistingUsername = (username, callback) => {
     //query the database for the username and see if there is a match
     //let returnValue = null;
@@ -208,7 +247,7 @@ const isExistingUsername = (username, callback) => {
       if (err) {
         console.error(err);
         // see what is in here on an error?? if any
-        console.dir(result);
+        //console.dir(result);
         connection.end();
         // do something here to not crash 
         return undefined;
@@ -227,13 +266,30 @@ const isExistingUsername = (username, callback) => {
       }
     });
 }
-
-
-
-
-isExistingUsername("jxffbob", (result) => console.log(result)); // an non existing user
+// below used to test isExistingUser(username,(result) => {...});
+//isExistingUsername("jxffbob", (result) => console.log(result)); // an non existing user
 //isExistingUsername("jeffbob", (result) => console.log(result)); // an non existing user
 
+
+// fetch route for if username exists
+app.get("/checkUsername", (req, res) => {
+  isExistingUsername(req.body.username, (result) => {
+    res.setHeader('Content-Type', 'application/json');
+    
+    // result should be true or false
+    if (result) {
+      // true
+      res.write('true');
+      res.end();
+      //res.end(JSON.stringify({ existingUser: true }));
+    } else {
+      // false
+      res.write('false');
+      res.end();
+      //res.end(JSON.stringify({ existingUser: false}));
+    }
+  });
+});
 
 // Error routes [Bob]
 app.get("/error", (req, res) => {
@@ -255,6 +311,8 @@ app.get("/register", (req, res) => {
       "Register for an account to stay up to date on our hottest deals.",
   };
   registerInputs.loggedIn = loggedIn;
+  console.log(JSON.stringify({ "users": req.session.allUsers}));
+  registerInputs.allUsers = JSON.stringify({ "users": req.session.allUsers});
 
   console.log("render register");
   res.render("register", registerInputs);
