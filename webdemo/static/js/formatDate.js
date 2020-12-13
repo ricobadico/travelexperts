@@ -1,3 +1,4 @@
+// Found by [Sheyi]
 exports.formatDate = function formatDate(date) {
     var d = new Date(date),
       month = "" + (d.getMonth() + 1),

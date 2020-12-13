@@ -1,13 +1,19 @@
+{{!-- Static page html, design, handlebars templating by [Sheyi] and [Susan]
+[Eric] provided tweaking to integrate with db data better, pass along req data, add variable travellercount
+[Bob] helped get render to differ based on being logged in or not
+[Susan] provided lots of style fixes, overall form structure --}}
+
 <link rel="stylesheet" href='/css/order.css'>
 {{>jumbotron}}
+
 <!-- Navbar -->
 {{#if loggedIn}} {{> navbarLoggedIn}} {{else}} {{> navbar}}{{/if}}
-{{!-- Page html and CSS by [Susan and Sheyi] --}}
-{{!-- Hidden Form Data needed by database and express added by [Eric] --}}
+
 <div class="container">
     <!--Elements within transparent box -->
     <div class="orderBox">
-        {{!-- TODO: With new form stuff added, need validation. Better styling might be needed too. Lastly, need to check if logged in to vary render --}}
+        {{!-- Much of page wrapped in div, with hidden inputs throughout to pass data to next page --}}
+        {{!-- TODO: With new form stuff added, need validation. Better styling might be needed too.--}}
         <form method="POST" action="orderPOST" class="needs-validation" novalidate> 
         
         <h1><i>Please Confirm Your Order</i> </h1>
@@ -74,13 +80,14 @@
         </div>
         <hr />
 
-        {{!-- Adding a section for contact info that only appears if not logged in [Eric]--}}
+        {{!-- Adding a section for contact info that only appears if not logged in [Eric], [Bob]--}}
         {{#if loggedIn}}
-            {{!-- CustomerID stored here if loggedin. TODO: pull value from session rather than hardcode1 --}}
+            {{!-- CustomerID stored here if loggedin --}}
 			<input type="hidden" id="{{uid}}" name="CustomerId" value="{{uid}}">
         
         {{else}}
 
+            {{!-- Form inputs for customer to add contact info. This is inserted as a new customer in the DB --}}
             <h2>Please log in or provide your contact information below:</h2>
             <div class="form-row ">
 	    			<div class="col-sm-6 ">
@@ -157,7 +164,8 @@
     
 </div>
 
-
+{{!-- Verification script --}}
+<script src="js/validateForm.js"></script>	
 
 <script>
     // Updates total cost field when adding quantity

@@ -1,6 +1,8 @@
+{{!-- Content, style, and validation by [Susan]
+[Eric] added little phone formatting function--}}
 <body>
 	
-	<link rel="stylesheet" href="css/style2.css">
+	<link rel="stylesheet" href="css/register.css">
 
 	{{> jumbotron}}
 
@@ -10,7 +12,7 @@
 <br/><br/>
 
 <div class="container">
-<div class="registrationForm">	
+	<div class="registrationForm">	
 		<form method="POST" action="registerPOST" class="needs-validation" novalidate>
 			<h4 class="text-center">Registration Form</h4>
 				<div class="form-row ">
@@ -27,6 +29,8 @@
 				</div>
 				<div class="form-row ">
 	    			<div class="col-sm-6 mb-3">
+						{{!-- Note that when impleneting this prototype, we would add a validation that pulls the db for all current users,
+						and ensures that the inputted one is unique. --}}
 						<label for="userName">Username:</label>
 						<div class="input-group">
 						<div class="input-group-prepend">
@@ -111,7 +115,7 @@
 </div>		
 </div>
 <script src="js/script.js"></script>	
-<script src="js/script2.js"></script>	
+<script src="js/validateForm.js"></script>	
 
 {{!-- Script for formatting phone number input --}}
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>

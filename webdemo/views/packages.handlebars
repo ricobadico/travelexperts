@@ -1,5 +1,9 @@
 
-	<!--link rel="stylesheet" href="css/reset.css" --> <!-- reset removed by bob-->
+	{{!-- Static page by [Eric] and [Sheyi]
+    [Eric] integrated template for database data pull,
+    [Sheyi did extra work styling and getting dates formatted    --}}
+    
+    <!--link rel="stylesheet" href="css/reset.css" --> <!-- reset removed by bob-->
 	<link rel="stylesheet" href="css/packages.css">
     
     {{> jumbotron}}
@@ -8,6 +12,7 @@
 
     <div class="packages-outer-grid">
 
+        {{!-- Handlebars is passed a Packages array object where each element contains the data for an individual package --}}
         {{#each Packages}}
         <!-- Package starts here -->
         <div class="package-grid">
@@ -21,7 +26,6 @@
                 <div class="package-desc">
                     {{PkgDesc}}
                 </div>
-                {{!-- TODO: Fix formatting of dates and add some padding --}}
                 <div class="package-dates">
                    {{PkgStartDate}} - {{PkgEndDate}}
                 </div>

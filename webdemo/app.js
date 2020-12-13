@@ -1,3 +1,8 @@
+// Initial server script created by [Susan], with lots of input from [everyone]. 
+// High credit for [Bob] who managed the inclusion and implementation of most additional modules:
+// especially express-session, bcrypt, redis, morgan for dev.
+// Routes are credited inline.
+
 const express = require("express");
 const mysql = require("mysql");
 const path = require("path");
@@ -15,6 +20,10 @@ const { connected } = require("process");
 const saltRounds = 10;
 const { formatDate } = require("./static/js/formatDate.js");
 
+// Define a user session stored through redis module (needed for login) [Bob]
+// **IMPORTANT**: please note the computer running the server requires
+// an installation of Redis for the code to function.
+// Downloading the .msi here will suffice:  https://github.com/microsoftarchive/redis/releases/tag/win-3.0.504
 const RedisStore = require("connect-redis")(session);
 const redisClient = redis.createClient();
 let user_id;
@@ -24,7 +33,6 @@ let loggedIn = false;
 let navbarPublic = true;
 let navbarAuth = false;
 
-//prettier-ignore
 function User(id, firstName, lastName, email) {
     (this.userid = id),
     (this.firstName = firstName),
@@ -49,8 +57,8 @@ if (process.env.NODE_ENV === "dev") {
   // log req res in dev
   app.use(morgan("dev"));
 }
-// prettier-ignore
-// session to identify unique client session and login auth
+
+// session to identify unique client session and login auth [Bob]
 app.use( 
   session({
     genid : (req) => {
@@ -68,9 +76,10 @@ app.use(
   })
 );
 
+// Serve files in static folder statically
 app.use("/", express.static(path.join(__dirname, "static")));
 
-// Manages the state change for Logged it and out;
+// Manages the state change for Logged in and out [Bob]
 app.use((req, res, next) => {
   if (req.session.uid) {
     loggedIn = true;
@@ -92,171 +101,8 @@ app.use((err, req, res, next) => {
 });
 
 // ROUTES ---------------------------------//
-app.get("/register", (req, res) => {
-  // This data gets passed into the template (in this case, for the header)
-  const registerInputs = {
-    Title: "Register",
-    Subtitle:
-      "Register for an account to stay up to date on our hottest deals.",
-  };
-  registerInputs.loggedIn = loggedIn;
-  registerInputs.navbarAuth = navbarAuth;
-  registerInputs.navbarPublic = navbarPublic;
 
-  console.log("render register");
-  res.render("register", registerInputs);
-});
-
-app.get("/packages", (req, res) => {
-  packagesInput = {
-    Title: "Our Packages",
-    Subtitle: "Find the perfect upcoming trip for you.",
-  };
-  let connection = getConnection();
-  connection.connect();
-
-  let datestring = `${new Date()}`
-  connection.query("SELECT * FROM packages WHERE PkgStartDate > ? ORDER BY PkgStartDate", new Date(), (err, result) => {
-
-    if (err) console.log(err);
-
-    packagesInput.loggedIn = loggedIn;
-    packagesInput.navbarAuth = navbarAuth;
-    packagesInput.navbarPublic = navbarPublic;
-    packagesInput.Packages = result;
-
-    for (let currentPackageIndex in packagesInput.Packages) {
-      packagesInput.Packages[currentPackageIndex].PkgStartDate = formatDate(
-        packagesInput.Packages[currentPackageIndex].PkgStartDate
-      );
-      packagesInput.Packages[currentPackageIndex].PkgEndDate = formatDate(
-        packagesInput.Packages[currentPackageIndex].PkgEndDate
-      );
-    }
-
-    console.log(packagesInput);
-    console.log("render packages");
-    res.render("packages", packagesInput);
-    connection.end();
-  });
-});
-
-// Orders Page - [Sheyi w/ Eric Assist]
-app.post("/orders", (req, res) => {
-  function formatDate(date) {
-    var d = new Date(date),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
-  }
-  date = formatDate(new Date());
-
-  const ordersInput = {
-    Title: "Your Order",
-    Subtitle: "Finish your planning ",
-    date: `${date}`,
-  };
-  let connection = getConnection();
-  connection.connect();
-  connection.query(
-    "SELECT * FROM packages where PackageId = ?",
-    req.body.packageId,
-    (err, result) => {
-      if (err) console.log(err);
-      ordersInput.PkgName = result[0].PkgName;
-      ordersInput.PkgBasePrice = result[0].PkgBasePrice;
-      ordersInput.PkgDesc = result[0].PkgDesc;
-      ordersInput.PkgStartDate = result[0].PkgStartDate;
-      ordersInput.PkgEndDate = result[0].PkgEndDate;
-      ordersInput.PackageId = req.body.packageId;
-      console.log(ordersInput);
-      console.log("render orders");
-
-      ordersInput.loggedIn = loggedIn;
-      ordersInput.navbarAuth = navbarAuth;
-      ordersInput.navbarPublic = navbarPublic;
-      if (req.session.uid) {
-        ordersInput.uid = req.session.uid;
-      } else {
-        ordersInput.uid = "";
-      }
-      res.render("orders", ordersInput);
-      connection.end();
-    }
-  );
-});
-
-// ordersPOST renders thank you page after posting to database
-app.post("/orderPOST", (req, res) => {
-  let connection = getConnection();
-  connection.connect();
-
-  // Depending on whether the user is logged in or not, we may need to run an extra query
-  // We can determine this because CustomerId is only passed in the req if logged in
-  //if logged in, we go straight to inserting the bookings
-  if (req.body.CustomerId) {
-    insertBookings(connection, req, res, null);
-
-    // Otherwise, we need to insert into the customer table first
-  } else {
-    console.log(req.body);
-    let CustFN = req.body.firstName;
-    let CustLN = req.body.lastName;
-    let CustEM = req.body.email;
-    let CustPH = req.body.pNumber;
-    let CustAD = req.body.address;
-    let CustCY = req.body.city;
-    let CustPV = req.body.prov;
-    let CustPC = req.body.pCode;
-    let sql1 =
-      "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    let inserts1 = [
-      CustFN,
-      CustLN,
-      CustEM,
-      CustPH,
-      CustAD,
-      CustCY,
-      CustPV,
-      CustPC,
-    ];
-    sql1 = mysql.format(sql1, inserts1);
-    console.log(sql1);
-
-    connection.query(sql1, (err, result) => {
-      if (err) console.log(err);
-      console.log("sql1 result:");
-      console.log(result.insertId);
-
-      insertBookings(connection, req, res, result);
-    });
-  }
-});
-
-app.post("/logout", (req, res, next) => {
-  req.session.uid = null;
-  loggedIn = false;
-  navbarAuth = false;
-  navbarPublic = true;
-  //this will be post route of `/`
-
-  homeInputs = {
-    skipIntro: req.query.skipIntro,
-    introSplashNumber: `${randomNum(6)}`,
-  };
-
-  homeInputs.skipIntro = true;
-  homeInputs.loggedIn = loggedIn;
-  homeInputs.navbarAuth = navbarAuth;
-  homeInputs.navbarPublic = navbarPublic;
-  res.render("home", homeInputs);
-});
-
+// Home render -- base [Susan], [Eric] adding custom intro tie-in, [Bob] connecting to login  
 app.get("/", (req, res) => {
   if (recentSessions) {
     console.dir(recentSessions);
@@ -276,7 +122,29 @@ app.get("/", (req, res) => {
   res.render("home", homeInputs);
 });
 
-//for logout
+
+// Logout route - [Bob]
+app.post("/logout", (req, res, next) => {
+  req.session.uid = null;
+  loggedIn = false;
+  navbarAuth = false;
+  navbarPublic = true;
+  //this will be post route of `/`
+
+  homeInputs = {
+    skipIntro: req.query.skipIntro,
+    introSplashNumber: `${randomNum(6)}`,
+  };
+
+  homeInputs.skipIntro = true;
+  homeInputs.loggedIn = loggedIn;
+  homeInputs.navbarAuth = navbarAuth;
+  homeInputs.navbarPublic = navbarPublic;
+  res.render("home", homeInputs);
+});
+
+
+//for logout - [Bob]
 app.post("/", (req, res) => {
   if (recentSessions) {
     console.dir(recentSessions);
@@ -292,6 +160,7 @@ app.post("/", (req, res) => {
   res.render("home", homeInputs);
 });
 
+//  Login route - [Bob]
 app.post("/login", (req, res, next) => {
   let connection = getConnection();
   connection.connect();
@@ -339,6 +208,8 @@ app.post("/login", (req, res, next) => {
   });
 });
 
+
+// Error routes [Bob]
 app.get("/error", (req, res) => {
   res.render("error", { httpcode: res.status, message: "Error Message" });
 });
@@ -347,9 +218,175 @@ app.post("/error", (req, res) => {
   res.render("error", { httpcode: res.status, message: "Error Message" });
 });
 
-// Feisty template render for Contact page, requires nested queries fed into a complicated template
-// It works but occasionally fails to pull from the db, I'll work on it
+
+// Register page render - base [Susan], login templating setup [Bob]
+app.get("/register", (req, res) => {
+
+  // This data gets passed into the template (in this case, for the header)
+  const registerInputs = {
+    Title: "Register",
+    Subtitle:
+      "Register for an account to stay up to date on our hottest deals.",
+  };
+  registerInputs.loggedIn = loggedIn;
+  registerInputs.navbarAuth = navbarAuth;
+  registerInputs.navbarPublic = navbarPublic;
+
+  console.log("render register");
+  res.render("register", registerInputs);
+});
+
+
+// Packages page render - dynamic pull from db [Eric], date formatting [Sheyi, Susan, Eric]
+app.get("/packages", (req, res) => {
+  // Set up data to be passed into template
+  packagesInput = {
+    Title: "Our Packages",
+    Subtitle: "Find the perfect upcoming trip for you.",
+  };
+
+  // Connect to db
+  let connection = getConnection();
+  connection.connect();
+
+  // Query to grab package data from db -- added date conditional and ordering [Eric]
+  connection.query("SELECT * FROM packages WHERE PkgStartDate > ? ORDER BY PkgStartDate", new Date(), (err, result) => {
+
+    if (err) console.log(err);
+
+    // Adding login data to template object [Bob]
+    packagesInput.loggedIn = loggedIn;
+    packagesInput.navbarAuth = navbarAuth;
+    packagesInput.navbarPublic = navbarPublic;
+
+    // This line adds an array of package data objects to the template input object - already arranged in such a way as to be used by handlebars 
+    packagesInput.Packages = result;
+
+    // Iterates over each package in packageInput.packges and applies a date formatting function to that data [Eric, Susan, Sheyi]
+    for (let currentPackageIndex in packagesInput.Packages) {
+      packagesInput.Packages[currentPackageIndex].PkgStartDate = formatDate(
+        packagesInput.Packages[currentPackageIndex].PkgStartDate
+      );
+      packagesInput.Packages[currentPackageIndex].PkgEndDate = formatDate(
+        packagesInput.Packages[currentPackageIndex].PkgEndDate
+      );
+    }
+
+    // Log data passed into packagesInput (for clarity server-side), then render it
+    console.log(packagesInput);
+    console.log("render packages");
+    res.render("packages", packagesInput);
+    connection.end();
+  });
+});
+
+
+// Orders Page render (accessible by clicking an order button for one package on Packages page) - [Sheyi] w/ [Eric] Assist
+app.post("/orders", (req, res) => {
+ 
+  // Use formatDate module to create a new date with human-friendly formatting [Sheyi]
+  date = formatDate(new Date());
+
+  // Setup data object for handlebars render
+  const ordersInput = {
+    Title: "Your Order",
+    Subtitle: "Finish your planning ",
+    date: `${date}`,
+  };
+
+  // Connect to db
+  let connection = getConnection();
+  connection.connect();
+
+  // Run query to just get package data from the package clicked on last page (packageID sent in request)
+  connection.query(
+    "SELECT * FROM packages where PackageId = ?", req.body.packageId, (err, result) => {
+      if (err) console.log(err);
+
+      // Grab all the relevant data from the resulting query and add it to the tamplate data object [Sheyi] w/ [Eric] assist
+      ordersInput.PkgName = result[0].PkgName;
+      ordersInput.PkgBasePrice = result[0].PkgBasePrice;
+      ordersInput.PkgDesc = result[0].PkgDesc;
+      ordersInput.PkgStartDate = result[0].PkgStartDate;
+      ordersInput.PkgEndDate = result[0].PkgEndDate;
+      ordersInput.PackageId = req.body.packageId;
+
+      console.log(ordersInput);
+      console.log("render orders");
+
+      //  Add login details - [Bob]
+      ordersInput.loggedIn = loggedIn;
+      ordersInput.navbarAuth = navbarAuth;
+      ordersInput.navbarPublic = navbarPublic;
+      if (req.session.uid) {
+        ordersInput.uid = req.session.uid;
+      } else {
+        ordersInput.uid = "";
+      }
+      res.render("orders", ordersInput);
+      connection.end();
+    }
+  );
+});
+
+// Order post to database and then Thank You Render (from clicking order button on Order page) - [Susan] w/ [Eric] Assist
+app.post("/orderPOST", (req, res) => {
+
+  // Connect to db
+  let connection = getConnection();
+  connection.connect();
+
+  // Depending on whether the user is logged in or not, we may need to run an extra query
+  // We can determine this because CustomerId is *only* passed in the req if logged in
+  // If logged in, we go straight to inserting the bookings
+  if (req.body.CustomerId) {
+
+    // There's a lot going on in this insertBookings function - two database inserts are made. 
+    // This was abstracted into a function to make this route more readable
+    insertBookings(connection, req, res, null);
+
+    // Otherwise, we need to insert into the customer table first
+  } else {
+    console.log("Request Body below:")
+    console.log(req.body);
+
+    // Grab customer info from form data sent through request
+    let CustFN = req.body.firstName;
+    let CustLN = req.body.lastName;
+    let CustEM = req.body.email;
+    let CustPH = req.body.pNumber;
+    let CustAD = req.body.address;
+    let CustCY = req.body.city;
+    let CustPV = req.body.prov;
+    let CustPC = req.body.pCode;
+
+    // IMPORTANT NOTE: Travel Experts DB currently treats Customer Business Phone as required and home phone as optional. That seems incorrect for individual customers.
+    // For the prototype, we are fixing this by inserting the customer's inputted phone number into both fields.
+    // However, if we were able to consult with Travel Experts, we would suggest to change CustHomePhone to required and set CustBusPhone as optional. 
+    let sql1 =
+      "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustBusPhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    let inserts1 = [CustFN, CustLN, CustEM, CustPH, CustPH, CustAD, CustCY, CustPV, CustPC];
+    sql1 = mysql.format(sql1, inserts1);
+    console.log(sql1);
+
+    // Do insert query to add customer entry
+    connection.query(sql1, (err, result) => {
+      if (err) console.log(err);
+
+      // We log the insert result just to allow following along in the server
+      console.log(result);
+
+      // Now that we have a new customer inserting (and can access the insertID through result, we run the large insertBookings function)
+      insertBookings(connection, req, res, result);
+    });
+  }
+});
+
+
+// Contact page render, using data from db - [Eric] 
 app.get("/contact", (req, res) => {
+
+  // Connect to db
   let connection = getConnection();
   connection.connect();
 
@@ -357,11 +394,11 @@ app.get("/contact", (req, res) => {
   let contactInputs = { Agencies: [] };
 
   // Query 1 : get the data. results[0] is the array of agencies, results[1] the array of agents
-  // prettier-ignore
   connection.query("SELECT * FROM agencies; SELECT * from agents", function (error, results) {
-    if (error) {
-      console.log(error);
-    } //throw new Error("Failed to load agency table from database");
+    if (error) console.log(error);
+
+    // Assign each query result to a variable
+    console.log(results);
     const agencies = results[0];
     const agents = results[1];
 
@@ -381,29 +418,30 @@ app.get("/contact", (req, res) => {
       // here, we are adding the current agent to the agency at the index corresponding to their id (which is -1)
       contactInputs.Agencies[homeAgency - 1].agents.push(agents[j]);
     }
-    // With the heavy lifting done, we can add any other needed data for the template, in this case the header information
+    // With the heavy lifting done, we can add any other needed data for the template, in this case the header information 
     contactInputs.Title = "Contact Us";
-    contactInputs.Subtitle =
-      "Contact one of our international travel agents for inquiries on your next travel destination.";
+    contactInputs.Subtitle = "Contact one of our international travel agents for inquiries on your next travel destination.";
 
-    console.log("render contacts");
     // We now have all the data needed to populate the template, in the form the template is expecting
-    // prettier-ignore
-      contactInputs.loggedIn = loggedIn;
-      contactInputs.navbarAuth = navbarAuth;
-      contactInputs.navbarPublic = navbarPublic;
-      console.dir(contactInputs);
-    res.render("contacts2", contactInputs);
+    console.log("render contacts");
+    contactInputs.loggedIn = loggedIn;
+    contactInputs.navbarAuth = navbarAuth;
+    contactInputs.navbarPublic = navbarPublic;
+    console.dir(contactInputs);
+
+    // Finally render
+    res.render("contacts", contactInputs);
     connection.end();
   });
 });
 
-// Insert the Register data into the database. All the Register page form needs to do is have "registerPOST" as its action to fire this off
+
+// Register data inserted into the database from Register page form, rendering Thank you page
+// db insert and routing by [Eric], login integration and await refactoring by [Bob], rendering to Thank You page by [Susan]
 app.post("/registerPOST", (req, res) => {
   // This is just fancy "javascript destructuring": assigns these variables to the corresponding properties of the req.body object
-  // prettier-ignore
   let {firstName, lastName, userName, pwd, email, pNumber, address, city, prov, pCode, sendInfo} = req.body;
-  //console.log(req.body);
+
   // Use the defined connection config to connect
   let connection = getConnection();
   connection.connect();
@@ -411,17 +449,15 @@ app.post("/registerPOST", (req, res) => {
   // Make a query based off of register form data, with placeholders for body entries
   // We'll write the sql as a variable on its own line to break up the code a little.
   //You could instead write it as a string directly as the connection.query first argument
-  //Note this query looks like lot - the format really just mean:
+  //Note this query looks like a lot - the format really just mean:
   //INSERT A NEW ENTRY INTO [a database table] (data,for,this,list,of,columns) THESE VALUE (one,datum,for,each,column,respectively)
-  let sql =
-    "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal` , `CustBusPhone`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  //prettier-ignore
-  let inserts = [firstName, lastName, email, pNumber, address, city, prov, pCode, pNumber];
+  let sql = "INSERT INTO customers (`CustFirstName`, `CustLastName`, `CustEmail`, `CustHomePhone`, `CustBusPhone`, `CustAddress`, `CustCity`, `CustProv`, `CustPostal`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  let inserts = [firstName, lastName, email, pNumber, pNumber, address, city, prov, pCode];
   sql = mysql.format(sql, inserts);
   console.log(sql);
 
-  // Use a mysql connection's built-in query function to query the database. First argument is the SQL query, second argument defines placeholders ('?') in that query.
-  // Third argument is the callback that happens once you've successfully gotten back the data (or an error) from the database
+  // Use a mysql connection's built-in query function to query the database. First argument is the SQL query, second argument
+  // is the callback that happens once you've successfully gotten back the data (or an error) from the database
   let recordId;
   connection.query(sql, async (err, result) => {
     if (err) {
@@ -430,6 +466,9 @@ app.post("/registerPOST", (req, res) => {
       throw Error;
     }
     // We're going to leave a console.log here just so anyone on the server can confirm that something happened
+    console.log(result);
+
+    // Create new user from customer entry [Bob]
     recordId = result.insertId;
     let user = new User(recordId, firstName, lastName, email);
     recentSessions[req.session.id] = user;
@@ -471,10 +510,6 @@ app.post("/registerPOST", (req, res) => {
 
       console.log(bcrypt.compareSync(pwd, hash));
     });
-
-    // We've done what we needed and can close the mysql connection!
-    // The user sent a request "/registerPOST" and is expecting a response! You need to tell the response to do something before we finish this express method call.
-    // Right now we go to the index page, but a page that acknowledges that they've been registered would be better.
   });
 
   //req.session.uuid = recordId; // should add to
@@ -483,7 +518,8 @@ app.post("/registerPOST", (req, res) => {
   user_email = email; //for testing
   // create User object
   console.dir(recentSessions);
-  // define registration thank you page variables which includes customer first name
+
+  // define registration thank you page variables which includes customer first name [Susan]
   const rThanksHeader = {
     Title: "Success!",
     Subtitle: "Your registration was successful",
@@ -491,15 +527,18 @@ app.post("/registerPOST", (req, res) => {
   };
   console.log("returning thank you page after register post");
   console.log(req.body.firstName);
-  // render registration thank you page
 
+  // add login info to template data object [Bob]
   rThanksHeader.loggedIn = loggedIn;
   rThanksHeader.navbarAuth = navbarAuth;
   rThanksHeader.navbarPublic = navbarPublic;
+
+  // render registration thank you page
   res.render("registerThanks", rThanksHeader);
 });
 
-// for testing the login
+
+// for testing the login [Bob]
 app.get("/sessionTest", (req, res, next) => {
   if (req.session.views) {
     req.session.views++;
@@ -534,6 +573,8 @@ app.get("/sessionTest", (req, res, next) => {
     res.end("welcome to the session demo. refresh!");
   }
 });
+
+
 // Start the express server listen for requests and send responses
 app.listen(PORT, () => {
   console.log(
@@ -541,10 +582,10 @@ app.listen(PORT, () => {
   );
 });
 
-// Helper function to insert bookings, cleans up code in /ordersPOST route
+// Helper function to insert bookings, cleans up code in /ordersPOST route -- [Eric], connection to Thank you page [Susan]
 function insertBookings(connection, req, res, result) {
   //STEP 1 -----
-  // TODO: Get all data needed to fill in a row of the bookings table in db
+  // Get all data needed to fill in a row of the bookings table in db
   // That includes BookingDate, BookingNo(?), TravelerCount, CustomerID, TripTypeId(?), PackageId
   // Some of those values we aren't getting from anywhere (marked with a ?), let's leave them null
   // Luckily, the rest we can get from req.body from the previous page
@@ -572,10 +613,11 @@ function insertBookings(connection, req, res, result) {
     if (err) console.log(err);
 
     //In the event of a successful insert, we can grab the newly inserted row's id out of the result object. We'll need it in the next insert query
+    console.log(result);
     let BookingId = result.insertId;
 
     //STEP 2 -----------
-    // TODO Get all data needed to fill in a row of bookingdetails table in db
+    // Get all data needed to fill in a row of bookingdetails table in db
     // That includes ItineraryNo(?), TripStart, TripEnd, Description, Destination(?), BasePrice, AgencyCommission(?), BookingId, RegionId(?), ClassId(?), FeeId(?), ProductSupplierId(?)
     // Note we need BookingId which means we have to insert into the bookings table above first, then grab the id from the result
     // The form will be fairly similar to the step 1 above. Note some values come from the package table (they aren't 3NF!) and we could do another query to get them...
@@ -590,6 +632,7 @@ function insertBookings(connection, req, res, result) {
     let sql =
       "INSERT INTO bookingdetails (`TripStart`, `TripEnd`, `Description`, `BasePrice`, `BookingId`) VALUES (?, ?, ?, ?, ?)";
     let inserts = [TripStart, TripEnd, Description, BasePrice, BookingId];
+    console.log(sql);
     sql = mysql.format(sql, inserts);
 
     connection.query(sql, (err, result) => {
@@ -598,8 +641,7 @@ function insertBookings(connection, req, res, result) {
       console.log(result);
       connection.end();
 
-      // TODO Need to insert render of thank you - I think maybe susan is on this
-      // define orders thank you page variables
+      // define orders thank you page variables [Susan]
       const oThanksHeader = {
         Title: "Success!",
         Subtitle: "Your purchase is processing",

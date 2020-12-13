@@ -1,0 +1,51 @@
+
+	{{!-- Initial Static Page Designed by [Susan], connecting to database and some layout changes by [Eric], final UX fixes by [Susan] --}}
+	
+	<link rel="stylesheet" href="/css/contacts.css">
+
+	{{!-- Partial templates for header and navbar  --}}
+	{{> jumbotron}}
+
+	{{#if loggedIn}} {{> navbarLoggedIn}} {{else}} {{> navbar}}{{/if}}
+    
+
+
+	<br/><br/>
+	{{!-- Here comes the template. The #each is going to iterate through an array of multiple agencies --}}
+	{{#each Agencies}}
+	<div class="container">
+		<div class="our-team agency-container">
+			<div class="agency-center">
+				<div class="picture">
+					<img class="img-fluid" src="../media/{{this.AgncyCity}}.jpg">
+				</div>
+				<h2 style="display:block">Travel Experts {{this.AgncyCity}}</h2>
+				<div class="address">
+					<h6>{{this.AgncyAddress}}, {{this.AgncyCity}}, {{this.AgncyProv}} {{this.AgncyPostal}}  —  {{this.AgncyPhone}}</h6>
+					<h6></h6>
+				</div>
+			</div>
+		</div>
+
+		{{!-- This #each populates the array of agent objects --}}
+	  	<div class="row">
+			{{#each agents}}
+	    	<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+		      <div class="our-team">
+		        <div class="picture">
+		        	<img class="img-fluid" src="../Media/agents/{{this.AgtFirstName}}.jpg">
+		        </div>
+		        <h3 class="name">{{this.AgtFirstName}} {{this.AgtLastName}}</h3>
+		        <h4 class="title">{{this.AgtPosition}}</h4>
+		        <ul class="info">
+					<li>{{this.AgtEmail}}</li>
+		        </ul>
+		        <ul class="peek-up">
+	          		<li>{{this.AgtBusPhone}}</li>
+	        	</ul>
+		       </div>
+	      	</div>
+			{{/each}}
+	    </div>
+	</div>	
+	{{/each}}

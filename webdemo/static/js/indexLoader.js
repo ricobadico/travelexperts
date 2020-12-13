@@ -1,3 +1,4 @@
+// [Eric]
 // This script launches the intro as long as it hasn't been told to skip.
 
 // Grab a pointer to the intro wrapper
