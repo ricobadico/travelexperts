@@ -1,3 +1,10 @@
+// [Bob]
+// this was intended to be a modlue for the password checking
+// but I never had time to refactor the code
+// below are test functions I used when implementing the code
+// they are not used right now
+
+
 const getConnection = require("../models/db.js");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;

@@ -7,11 +7,11 @@ const express = require("express");
 const mysql = require("mysql");
 const path = require("path");
 const handlebars = require("express-handlebars");
-const getConnection = require("./models/db.js");
-const auth = require("./modules/auth.js");
-const morgan = require("morgan");
+const getConnection = require("./models/db.js"); // module for getting a connection instance [Bob]
+//const auth = require("./modules/auth.js"); //bycrypt testing module not used see auth.js [Bob]
+//const morgan = require("morgan"); //used for testing, i removed the middleware so not needed [Bob]
 const dotenv = require("dotenv");
-const { randomNum } = require("./static/js/randomNum.js");
+const { randomNum } = require("./static/js/randomNum.js"); //[Eric] Animation Photos
 const redis = require("redis");
 const session = require("express-session");
 const uuid = require("uuid");
@@ -23,16 +23,17 @@ const { formatDate } = require("./static/js/formatDate.js");
 // Define a user session stored through redis module (needed for login) [Bob]
 // **IMPORTANT**: please note the computer running the server requires
 // an installation of Redis for the code to function.
-// Downloading the .msi here will suffice:  https://github.com/microsoftarchive/redis/releases/tag/win-3.0.504
+// Downloading the .msi here will suffice: ****** https://github.com/microsoftarchive/redis/releases/tag/win-3.0.504 *****
 const RedisStore = require("connect-redis")(session);
 const redisClient = redis.createClient();
 let user_id;
 let user_email;
 let recentSessions = {};
 let loggedIn = false;
-let navbarPublic = true;
-let navbarAuth = false;
 
+// [Bob] was the start of a User model but not really used
+// Once Session was working we use it as we don't use an ORM
+// I have some code that sets it up and I don't have time to factor it out
 function User(id, firstName, lastName, email) {
     (this.userid = id),
     (this.firstName = firstName),
@@ -117,8 +118,6 @@ app.get("/", (req, res) => {
   };
 
   homeInputs.loggedIn = loggedIn;
-  homeInputs.navbarAuth = navbarAuth;
-  homeInputs.navbarPublic = navbarPublic;
   res.render("home", homeInputs);
 });
 
@@ -127,9 +126,6 @@ app.get("/", (req, res) => {
 app.post("/logout", (req, res, next) => {
   req.session.uid = null;
   loggedIn = false;
-  navbarAuth = false;
-  navbarPublic = true;
-  //this will be post route of `/`
 
   homeInputs = {
     skipIntro: req.query.skipIntro,
@@ -138,8 +134,6 @@ app.post("/logout", (req, res, next) => {
 
   homeInputs.skipIntro = true;
   homeInputs.loggedIn = loggedIn;
-  homeInputs.navbarAuth = navbarAuth;
-  homeInputs.navbarPublic = navbarPublic;
   res.render("home", homeInputs);
 });
 
@@ -149,14 +143,10 @@ app.post("/", (req, res) => {
   if (recentSessions) {
     console.dir(recentSessions);
   }
-  //res.writeHead(200, { "Content-Type": "text/html" });
-  //console.log(req.query);
   console.log("render home");
   // the home page is injected with some values that determine whether the intro happens, and what splash image to show
   homeInputs = {};
   homeInputs.loggedIn = loggedIn;
-  homeInputs.navbarAuth = navbarAuth;
-  homeInputs.navbarPublic = navbarPublic;
   res.render("home", homeInputs);
 });
 
@@ -229,8 +219,6 @@ app.get("/register", (req, res) => {
       "Register for an account to stay up to date on our hottest deals.",
   };
   registerInputs.loggedIn = loggedIn;
-  registerInputs.navbarAuth = navbarAuth;
-  registerInputs.navbarPublic = navbarPublic;
 
   console.log("render register");
   res.render("register", registerInputs);
@@ -256,8 +244,6 @@ app.get("/packages", (req, res) => {
 
     // Adding login data to template object [Bob]
     packagesInput.loggedIn = loggedIn;
-    packagesInput.navbarAuth = navbarAuth;
-    packagesInput.navbarPublic = navbarPublic;
 
     // This line adds an array of package data objects to the template input object - already arranged in such a way as to be used by handlebars 
     packagesInput.Packages = result;
@@ -316,8 +302,6 @@ app.post("/orders", (req, res) => {
 
       //  Add login details - [Bob]
       ordersInput.loggedIn = loggedIn;
-      ordersInput.navbarAuth = navbarAuth;
-      ordersInput.navbarPublic = navbarPublic;
       if (req.session.uid) {
         ordersInput.uid = req.session.uid;
       } else {
@@ -425,8 +409,6 @@ app.get("/contact", (req, res) => {
     // We now have all the data needed to populate the template, in the form the template is expecting
     console.log("render contacts");
     contactInputs.loggedIn = loggedIn;
-    contactInputs.navbarAuth = navbarAuth;
-    contactInputs.navbarPublic = navbarPublic;
     console.dir(contactInputs);
 
     // Finally render
@@ -530,8 +512,6 @@ app.post("/registerPOST", (req, res) => {
 
   // add login info to template data object [Bob]
   rThanksHeader.loggedIn = loggedIn;
-  rThanksHeader.navbarAuth = navbarAuth;
-  rThanksHeader.navbarPublic = navbarPublic;
 
   // render registration thank you page
   res.render("registerThanks", rThanksHeader);
@@ -648,8 +628,6 @@ function insertBookings(connection, req, res, result) {
       };
       console.log("returning thank you page after orders post");
       oThanksHeader.loggedIn = loggedIn;
-      oThanksHeader.navbarAuth = navbarAuth;
-      oThanksHeader.navbarPublic = navbarPublic;
       // render registration thank you page
       res.render("ordersThanks", oThanksHeader);
     });
