@@ -51,13 +51,13 @@
 				<div class="form-row">	
 	    			<div class="col-sm-6">
 						<label for="email">Email:</label><br/>
-						<input class="form-control" type="text" name="email" id="email" required="required" placeholder="Email" onchange="checkEmail(this)">
+						<input class="form-control" type="text" name="email" id="email" required="required" placeholder="Email" onchange="checkEmail(this)" onsubmit="checkEmail(this)">
 						<div class="invalid-feedback">Please enter your email</div>
 						<br/>
 					</div>	
 					<div class="col-sm-6">
 						<label for="email">Phone Number:</label><br/>
-						<input class="form-control" type="tel" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)">
+						<input class="form-control" type="tel" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)" onsubmit="checkNumber(this)">
 						<div class="invalid-feedback">Please enter your phone number</div>
 						<br/>
 						<script src="js/phoneFormatter.js"></script>
@@ -94,7 +94,7 @@
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="pCode">Postal Code:</label><br/>
-						<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
+						<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()" onsubmit="checkPcode()">
 						<div class="invalid-feedback">Please enter your postal code</div>
 					</div>		
 				</div>	
