@@ -48,16 +48,18 @@ app.set("view engine", "handlebars");
 app.engine("handlebars", handlebars({ extname: "handlebars" }));
 
 //Load Config Environment variables
+//Having you environment vars outside you code is common best practice
 dotenv.config({ path: "./.env", debug: false });
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8000; //useful when in production in can change
 
 // Setup Express Middleware ---------------------------------//
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // parse url
-if (process.env.NODE_ENV === "dev") {
-  // log req res in dev
-  app.use(morgan("dev"));
-}
+
+// [bob]uncomment if using morgon, NODE_ENV is set with cross env module in the start script package.json
+//if (process.env.NODE_ENV === "development") {
+//  app.use(morgan("dev"));
+//}
 
 // session to identify unique client session and login auth [Bob]
 app.use( 
@@ -81,6 +83,7 @@ app.use(
 app.use("/", express.static(path.join(__dirname, "static")));
 
 // Manages the state change for Logged in and out [Bob]
+// This is run every request and sets the gobal state of logginIn in-sync with the session
 app.use((req, res, next) => {
   if (req.session.uid) {
     loggedIn = true;
@@ -108,8 +111,6 @@ app.get("/", (req, res) => {
   if (recentSessions) {
     console.dir(recentSessions);
   }
-  //res.writeHead(200, { "Content-Type": "text/html" });
-  //console.log(req.query);
   console.log("render home");
   // the home page is injected with some values that determine whether the intro happens, and what splash image to show
   homeInputs = {
@@ -137,18 +138,6 @@ app.post("/logout", (req, res, next) => {
   res.render("home", homeInputs);
 });
 
-
-//for logout - [Bob]
-app.post("/", (req, res) => {
-  if (recentSessions) {
-    console.dir(recentSessions);
-  }
-  console.log("render home");
-  // the home page is injected with some values that determine whether the intro happens, and what splash image to show
-  homeInputs = {};
-  homeInputs.loggedIn = loggedIn;
-  res.render("home", homeInputs);
-});
 
 //  Login route - [Bob]
 app.post("/login", (req, res, next) => {
