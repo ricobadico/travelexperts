@@ -26,9 +26,12 @@ const { formatDate } = require("./static/js/formatDate.js");
 // Downloading the .msi here will suffice: ****** https://github.com/microsoftarchive/redis/releases/tag/win-3.0.504 *****
 const RedisStore = require("connect-redis")(session);
 const redisClient = redis.createClient();
+
+// a few globals, these next 3 were for testing and could be factored out
 let user_id;
 let user_email;
 let recentSessions = {};
+// only this one is truely required and set per request with Session
 let loggedIn = false;
 
 // [Bob] was the start of a User model but not really used
@@ -44,24 +47,28 @@ function User(id, firstName, lastName, email) {
 const app = express();
 
 //  Set handlebars as view engine
+// [Bob][Susan] did the main conversion and starter templates
+// [Everyone] converted their static html and route call from there
 app.set("view engine", "handlebars");
 app.engine("handlebars", handlebars({ extname: "handlebars" }));
 
 //Load Config Environment variables
-//Having you environment vars outside you code is common best practice
+//[Bob]Having your environment vars outside you code is common best practice
 dotenv.config({ path: "./.env", debug: false });
-const PORT = process.env.PORT || 8000; //useful when in production in can change
+const PORT = process.env.PORT || 8000; 
 
 // Setup Express Middleware ---------------------------------//
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // parse url
 
-// [bob]uncomment if using morgon, NODE_ENV is set with cross env module in the start script package.json
+// [bob] please uncomment if using morgon, NODE_ENV is set with cross-env module in the start script package.json
 //if (process.env.NODE_ENV === "development") {
 //  app.use(morgan("dev"));
 //}
 
 // session to identify unique client session and login auth [Bob]
+// can remember you are loggin in after closing upto a timelimit
+// needed for multiple connections from different users
 app.use( 
   session({
     genid : (req) => {
@@ -432,7 +439,8 @@ app.post("/registerPOST", (req, res) => {
   let recordId;
   connection.query(sql, async (err, result) => {
     if (err) {
-      await connection.end();
+      //await connection.end();
+      connection.end();
       console.error(err);
       throw Error;
     }
@@ -440,12 +448,14 @@ app.post("/registerPOST", (req, res) => {
     console.log(result);
 
     // Create new user from customer entry [Bob]
+    // this was for making a user model later and tracking Sessions for testing
     recordId = result.insertId;
     let user = new User(recordId, firstName, lastName, email);
     recentSessions[req.session.id] = user;
     //console.log(result.insertId);
 
-    await connection.end();
+    //await connection.end();
+    connection.end();
     // if the customer was inserted we take that record and
     // use it insert and save the salted password hash to the db.
     await bcrypt.hash(pwd, saltRounds, async (err, hash) => {
@@ -473,8 +483,10 @@ app.post("/registerPOST", (req, res) => {
             req.session.uid = recordId;
             req.session.email = email;
             console.log(`Store req.session.email = ${req.session.email}`);
-            await req.session.save();
-            await connection2.end();
+            //await req.session.save();
+            //await connection2.end();
+            req.session.save();
+            connection2.end();
           }
         });
       }
@@ -483,11 +495,8 @@ app.post("/registerPOST", (req, res) => {
     });
   });
 
-  //req.session.uuid = recordId; // should add to
-  //req.session.email = email;
   user_id = recordId; //for testing
   user_email = email; //for testing
-  // create User object
   console.dir(recentSessions);
 
   // define registration thank you page variables which includes customer first name [Susan]
