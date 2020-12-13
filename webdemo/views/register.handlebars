@@ -36,7 +36,7 @@
 						<div class="input-group-prepend">
 	          				<span class="input-group-text" id="inputGroupPrepend">@</span>
 	        			</div>
-						<input class="form-control" type="text" name="userName" id="userName" required="required" placeholder="Username" onchange="checkUsername(this)">
+						<input class="form-control" type="text" name="userName" id="userName" required="required" placeholder="Username" onchange="checkUsername(this)" onsubmit="checkUsername(this)">
 						<div class="invalid-feedback">Please enter a username</div>
 						<br/>
 						</div>	
@@ -109,8 +109,8 @@
 		    	<textarea class="form-control" id="addCom" rows="3"></textarea><br/><br/>
 		    </div>
 		  		
-				<input class="btn btn-info" type="submit" value="Send Registration" onclick="return confirm('Please confirm all information is accurate upon submission')"/>
-				<input class="btn btn-info" type="reset" value="Reset Form" onclick="return confirm('Do you really want to reset?')"/>
+				<input class="btn btn-info" type="submit"  tabindex="-1" value="Send Registration" onclick="return confirm('Please confirm all information is accurate upon submission')"/>
+				<input class="btn btn-info" type="reset"  tabindex="-2" value="Reset Form" onclick="return confirm('Do you really want to reset?')"/>
 		</form>
 </div>		
 </div>

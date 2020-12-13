@@ -34,7 +34,6 @@ let user_email;
 let recentSessions = {};
 // only this one is truely required and set per request with Session
 let loggedIn = false;
-let allUsers;
 
 // [Bob] was the start of a User model but not really used
 // Once Session was working we use it as we don't use an ORM
@@ -102,12 +101,7 @@ app.use((req, res, next) => {
     req.session.login = false;
     req.session.uid = null;
   }
-  getAllUsers((result) => {
-    req.session.allUsers = result;
-    //allUsers = result;
-    req.session.save();
-  });
-  console.dir(req.session);
+  //console.dir(req.session);
   next();
 });
 
@@ -202,35 +196,6 @@ app.post("/login", (req, res, next) => {
 });
 
 
-const getAllUsers = (callback) => {
-    let connection = getConnection();
-    connection.connect();
-    let sql = "SELECT Username FROM web_credentials"
-    connection.query(sql, (err, result) => {
-      if (err) {
-        console.error(err);
-        // see what is in here on an error?? if any
-        console.dir(result);
-        connection.end();
-        // do something here to not crash
-      }
-      console.log(`Query success!`)
-      //inspect the result object
-      //console.dir(result);
-      connection.end()
-      var userArray = [];
-      for (let i = 0; i < result.length; i++) {
-        userArray.push(result[i].Username);
-      }
-      callback(userArray);
-    });
-}
-
-//getAllUsers((result) => {
-//  allUsers = result;
-//  console.log(allUsers);
-//});
-
 
 //[Bob]
 const isExistingUsername = (username, callback) => {
@@ -273,20 +238,14 @@ const isExistingUsername = (username, callback) => {
 
 // fetch route for if username exists
 app.get("/checkUsername", (req, res) => {
-  isExistingUsername(req.body.username, (result) => {
+  console.log(req.query.username)
+  isExistingUsername(req.query.username, (result) => {
     res.setHeader('Content-Type', 'application/json');
-    
-    // result should be true or false
+    console.log(result); 
     if (result) {
-      // true
-      res.write('true');
-      res.end();
-      //res.end(JSON.stringify({ existingUser: true }));
+      res.end(JSON.stringify({ existingUser: true }));
     } else {
-      // false
-      res.write('false');
-      res.end();
-      //res.end(JSON.stringify({ existingUser: false}));
+      res.end(JSON.stringify({ existingUser: false}));
     }
   });
 });
@@ -311,8 +270,6 @@ app.get("/register", (req, res) => {
       "Register for an account to stay up to date on our hottest deals.",
   };
   registerInputs.loggedIn = loggedIn;
-  console.log(JSON.stringify({ "users": req.session.allUsers}));
-  registerInputs.allUsers = JSON.stringify({ "users": req.session.allUsers});
 
   console.log("render register");
   res.render("register", registerInputs);
