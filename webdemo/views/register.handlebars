@@ -13,7 +13,7 @@
 
 <div class="container">
 	<div class="registrationForm">	
-		<form method="POST" action="registerPOST" class="needs-validation" novalidate>
+		<form method="POST" action="registerPOST" id="myForm" class="needs-validation" novalidate>
 			<h4 class="text-center">Registration Form</h4>
 				<div class="form-row ">
 	    			<div class="col-sm-6 ">
@@ -94,7 +94,7 @@
 					</div>
 					<div class="col-sm-6 mb-3">
 						<label for="pCode">Postal Code:</label><br/>
-						<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
+						<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode(this)">
 						<div class="invalid-feedback">Please enter your postal code</div>
 					</div>		
 				</div>	
@@ -109,12 +109,11 @@
 		    	<textarea class="form-control" id="addCom" rows="3"></textarea><br/><br/>
 		    </div>
 		  		
-				<input class="btn btn-info" type="submit" value="Send Registration" onclick="return confirm('Please confirm all information is accurate upon submission')"/>
+				<input class="btn btn-info" type="submit" value="Send Registration" onclick="return confirm('Please confirm all information is accurate upon submission'); empty();"/>
 				<input class="btn btn-info" type="reset" value="Reset Form" onclick="return confirm('Do you really want to reset?')"/>
 		</form>
 </div>		
-</div>
-<script src="js/script.js"></script>	
+</div>	
 <script src="js/validateForm.js"></script>	
 
 {{!-- Script for formatting phone number input --}}
