@@ -19,6 +19,7 @@ const bcrypt = require("bcrypt");
 const { connected } = require("process");
 const saltRounds = 10;
 const { formatDate } = require("./static/js/formatDate.js");
+const { get } = require("http");
 
 // Define a user session stored through redis module (needed for login) [Bob]
 // **IMPORTANT**: please note the computer running the server requires
@@ -100,7 +101,7 @@ app.use((req, res, next) => {
     req.session.login = false;
     req.session.uid = null;
   }
-  console.dir(req.session);
+  //console.dir(req.session);
   next();
 });
 
@@ -194,6 +195,60 @@ app.post("/login", (req, res, next) => {
   });
 });
 
+
+
+//[Bob]
+const isExistingUsername = (username, callback) => {
+    //query the database for the username and see if there is a match
+    //let returnValue = null;
+    let connection = getConnection();
+    connection.connect();
+    let sql = "SELECT Username FROM web_credentials WHERE Username = ?"
+    let insert = [username];
+    sql = mysql.format(sql,insert);
+    console.log(`validate user ${username}`);
+    //console.log(`sql: ${sql}`);
+    connection.query(sql, (err, result) => {
+      if (err) {
+        console.error(err);
+        // see what is in here on an error?? if any
+        //console.dir(result);
+        connection.end();
+        // do something here to not crash 
+        return undefined;
+      }
+      console.log(`Query success!`)
+      //inspect the result object
+      //console.dir(result);
+      if (result.length > 0) {
+        connection.end();
+        //returnValue = true;
+        callback(true);
+      } else {
+        connection.end();
+        //returnValue = false;
+        callback(false);
+      }
+    });
+}
+// below used to test isExistingUser(username,(result) => {...});
+//isExistingUsername("jxffbob", (result) => console.log(result)); // an non existing user
+//isExistingUsername("jeffbob", (result) => console.log(result)); // an non existing user
+
+
+// fetch route for if username exists
+app.get("/checkUsername", (req, res) => {
+  console.log(req.query.username)
+  isExistingUsername(req.query.username, (result) => {
+    res.setHeader('Content-Type', 'application/json');
+    console.log(result); 
+    if (result) {
+      res.end(JSON.stringify({ existingUser: true }));
+    } else {
+      res.end(JSON.stringify({ existingUser: false}));
+    }
+  });
+});
 
 // Error routes [Bob]
 app.get("/error", (req, res) => {
@@ -439,7 +494,6 @@ app.post("/registerPOST", (req, res) => {
   let recordId;
   connection.query(sql, async (err, result) => {
     if (err) {
-      //await connection.end();
       connection.end();
       console.error(err);
       throw Error;
@@ -454,7 +508,6 @@ app.post("/registerPOST", (req, res) => {
     recentSessions[req.session.id] = user;
     //console.log(result.insertId);
 
-    //await connection.end();
     connection.end();
     // if the customer was inserted we take that record and
     // use it insert and save the salted password hash to the db.
@@ -483,8 +536,6 @@ app.post("/registerPOST", (req, res) => {
             req.session.uid = recordId;
             req.session.email = email;
             console.log(`Store req.session.email = ${req.session.email}`);
-            //await req.session.save();
-            //await connection2.end();
             req.session.save();
             connection2.end();
           }

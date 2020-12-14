@@ -13,7 +13,7 @@
 
 <div class="container">
 	<div class="registrationForm">	
-		<form method="POST" action="registerPOST" class="needs-validation" novalidate>
+		<form method="POST" action="registerPOST" class="needs-validation" onSubmit="return checkAll();">
 			<h4 class="text-center">Registration Form</h4>
 				<div class="form-row ">
 	    			<div class="col-sm-6 ">
@@ -36,7 +36,7 @@
 						<div class="input-group-prepend">
 	          				<span class="input-group-text" id="inputGroupPrepend">@</span>
 	        			</div>
-						<input class="form-control" type="text" name="userName" id="userName" required="required" placeholder="Username">
+						<input class="form-control" type="text" name="userName" id="userName" required="required" placeholder="Username" onchange="checkUsername(this)">
 						<div class="invalid-feedback">Please enter a username</div>
 						<br/>
 						</div>	
@@ -57,7 +57,7 @@
 					</div>	
 					<div class="col-sm-6">
 						<label for="email">Phone Number:</label><br/>
-						<input class="form-control" type="tel" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)">
+						<input class="form-control" type="tel" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)" >
 						<div class="invalid-feedback">Please enter your phone number</div>
 						<br/>
 						<script src="js/phoneFormatter.js"></script>
@@ -109,12 +109,12 @@
 		    	<textarea class="form-control" id="addCom" rows="3"></textarea><br/><br/>
 		    </div>
 		  		
-				<input class="btn btn-info" type="submit" value="Send Registration" onclick="return confirm('Please confirm all information is accurate upon submission')"/>
-				<input class="btn btn-info" type="reset" value="Reset Form" onclick="return confirm('Do you really want to reset?')"/>
+				<input class="btn btn-info" type="submit"  tabindex="-1" value="Send Registration" onclick="return confirm('Please confirm all information is accurate upon submission');"/>
+				<input class="btn btn-info" type="reset"  tabindex="-2" value="Reset Form" onclick="return confirm('Do you really want to reset?');"/>
 		</form>
 </div>		
 </div>
-<script src="js/script.js"></script>	
+<!--script src="js/script.js"></script-->	
 <script src="js/validateForm.js"></script>	
 
 {{!-- Script for formatting phone number input --}}

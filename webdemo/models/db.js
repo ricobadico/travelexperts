@@ -1,6 +1,7 @@
 const mysql = require("mysql");
 
-// prettier-ignore
+// prettier-ignore [Bob]
+// used but should have promisified it. long running queries or remote db may cause problems as it isn't async compatible
 const getConnection = () => {
     // Open up the database for use. Any expreess method call can use this 'connection' variable, but needs to connect and end it's particular connection instance! (see existing examples)
     try {
@@ -19,6 +20,7 @@ const getConnection = () => {
     }
 }
 
+// not used and not working
 const getConn = async () => {
   try {
     const connection = await mysql.createConnection({
