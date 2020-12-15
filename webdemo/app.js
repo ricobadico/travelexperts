@@ -365,6 +365,8 @@ app.post("/orders", (req, res) => {
 });
 
 // Order post to database and then Thank You Render (from clicking order button on Order page) - [Susan] w/ [Eric] Assist
+// This gets called directly on form submission on the orders page. In the full website, the form submission would direct to
+// a secure payment service, where the customer would pay, and only after completion there would this route be called.
 app.post("/orderPOST", (req, res) => {
 
   // Connect to db

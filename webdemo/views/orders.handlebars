@@ -13,7 +13,7 @@
     <!--Elements within transparent box -->
     <div class="orderBox">
         {{!-- Much of page wrapped in div, with hidden inputs throughout to pass data to next page --}}
-        {{!-- TODO: With new form stuff added, need validation. Better styling might be needed too.--}}
+
         <form method="POST" action="orderPOST" class="needs-validation" novalidate> 
         
         <h1><i>Please Confirm Your Order</i> </h1>
@@ -30,6 +30,10 @@
                     <input type="hidden" name="PkgName" value="{{PkgName}}"/> 
                 </div>
             </div>
+
+            {{!-- The package description is pretty minimal, just using the simple one-line data stored within the existing database.
+            If we were to continue working with Travel Experts, we'd suggest we team up with the people who make the packages
+            as there is room to have more robust information on this page --}}
             <div class="row">
                 <div class="col-sm">
                     <h4>Description:</h4>
@@ -39,6 +43,7 @@
                     <input type="hidden" name="PkgDesc" value="{{PkgDesc}}"/> 
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-sm">
                     <h4>Order Date: </h4>
@@ -47,6 +52,7 @@
                     <p>{{date}}</p>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-sm">
                     <h4>Price:</h4>
@@ -55,6 +61,7 @@
                     <p id="packageSingleCost">${{PkgBasePrice}}.00</p>
                 </div>
             </div>
+
             {{!-- Extra functionality to allow for buying multiple tickets [Eric] --}}
             {{!-- Adding a row to choose quantity of travellers --}}
             <div class="row">
@@ -66,6 +73,7 @@
                     <input class="order-form-input" min="1" type="number" value="1" id="orderquantity" name="TravelerCount" onchange=updateTotal()>
                 </div>
             </div>
+            
             {{!-- Adding a row to show cost --}}
             <div class="row">
                 <div class="col-sm">
@@ -95,12 +103,14 @@
 						<input class="form-control" type="text" name="firstName" id="firstName" required="required" placeholder="First Name">
 						<div class="invalid-feedback">Please enter your first name</div><br/>
 					</div>	
+
 					<div class="col-sm-6 ">
 						<label for="lastName">Last Name:</label><br/>
 						<input class="form-control" type="text" name="lastName" id="lastName" required="required" placeholder="Last Name">
 						<div class="invalid-feedback">Please enter your last name</div>
 					</div>
 				</div>
+
                 <div class="form-row">	
 	    			<div class="col-sm-6">
 						<label for="email">Email:</label><br/>
@@ -108,6 +118,7 @@
 						<div class="invalid-feedback">Please enter your email</div>
 						<br/>
 					</div>	
+
 					<div class="col-sm-6">
 						<label for="email">Phone Number:</label><br/>
 						<input class="form-control" type="tel" name="pNumber" id="pNumber" required="required" placeholder="Phone Number" onchange="checkNumber(this)">
@@ -116,17 +127,20 @@
 						<script src="js/phoneFormatter.js"></script>
 					</div>
 				</div>	
+
 				<div class="form-row ">
 	    			<div class="col-sm-6 mb-3">
 						<label for="address">Address:</label>
 						<input class="form-control" type="text" name="address" id="address" required="required" placeholder="Address">
 						<div class="invalid-feedback">Please enter your address</div><br/>	
 					</div>
+
 					<div class="col-sm-6 mb-3">
 						<label for="city">City:</label><br/>
 						<input class="form-control" type="text" name="city" id="city" required="required" placeholder="City">
 						<div class="invalid-feedback">Please enter your city</div>
 					</div>
+
 					<div class="col-sm-6 mb-3">
 						<label for="prov">Province</label>
 					    <select class="form-control" name="prov" id="prov" required="required">
@@ -145,6 +159,7 @@
 					      <option>YT</option>
 					    </select>
 					</div>
+
 					<div class="col-sm-6 mb-3">
 						<label for="pCode">Postal Code:</label><br/>
 						<input class="form-control" type="text" name="pCode" id="pCode" required="required" placeholder="Postal Code" onchange="checkPcode()">
