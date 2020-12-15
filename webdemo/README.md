@@ -16,11 +16,14 @@ it as a service. This can be done by simply going to
 https://github.com/microsoftarchive/redis/releases/tag/win-3.0.504
 and downloading the .msi file provided there.
 
-2. We added another table to the mysql database (web_credentials),
+2. We updated the database to include another table (web_credentials),
 as well as updated the packages table so that it contained packages
 in the future (such that the render of the package page only shows
-upcoming packages). The mysql import files are provided in the root of
-this folder.
+upcoming packages). We've provided an export of this updated database,
+which we've named travelexpertsGroup1. We have now set up the code 
+to run using this database name and not travelexperts. All that is
+needed is to import the sql file in the root directory here, making 
+sure not to enable foreign ref checks on import.
 
 3. Database connection credentials are stored in the .env file in the
 root project folder. Should you import the tables and have different
